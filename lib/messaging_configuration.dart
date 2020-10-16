@@ -6,9 +6,7 @@ class MessagingConfiguration {
       {Function(Map<String, dynamic>) onMessageCallback,
       bool isAWSNotification = true,
       String iconApp}) async {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      MessagingConfig.singleton.init(context, onMessageCallback,
-          iconApp: iconApp, isAWSNotification: isAWSNotification);
-    });
+    MessagingConfig.singleton.init(context, onMessageCallback,
+        iconApp: iconApp, isAWSNotification: isAWSNotification);
   }
 }
