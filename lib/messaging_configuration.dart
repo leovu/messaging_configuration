@@ -17,7 +17,7 @@ class MessagingConfiguration {
 
   static const iOSPushToken =
       const MethodChannel('flutter.io/receivePushNotificationToken');
-  Future<String> getPushToken({bool isAWS = false}) async {
+  static Future<String> getPushToken({bool isAWS = false}) async {
     String deviceToken = "";
     if (!kIsWeb) {
       if (Platform.isIOS && isAWS) {
