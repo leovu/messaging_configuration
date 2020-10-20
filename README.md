@@ -164,7 +164,7 @@ A new flutter plugin project.
           }
     }
    
-      let PUSH_TOKEN_KEY = "PUSH_TOKEN_KEY"
+      let PUSH_TOKEN_KEY = "flutter.PUSH_TOKEN_KEY"
       class Common {
           static let shared = Common()
           static var PUSH_TOKEN: String {
