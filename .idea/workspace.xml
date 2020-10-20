@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1834967c-5dd8-410c-99b0-d521de8027f2" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/lib/messaging_configuration.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/messaging_configuration.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/kotlin/wao/flutter/application/project/messaging_configuration/MessagingConfigurationPlugin.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/kotlin/wao/flutter/application/project/messaging_configuration/MessagingConfigurationPlugin.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/android/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/example/android/gradle.properties" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -59,24 +61,27 @@
         <option value="$PROJECT_DIR$/test/messaging_configuration_test.dart" />
         <option value="$PROJECT_DIR$/android/build.gradle" />
         <option value="$PROJECT_DIR$/example/lib/main.dart" />
-        <option value="$PROJECT_DIR$/android/src/main/kotlin/wao/flutter/application/project/messaging_configuration/MessagingConfigurationPlugin.kt" />
         <option value="$PROJECT_DIR$/android/gradle/wrapper/gradle-wrapper.properties" />
         <option value="$PROJECT_DIR$/example/android/gradle/wrapper/gradle-wrapper.properties" />
+        <option value="$PROJECT_DIR$/android/src/main/kotlin/wao/flutter/application/project/messaging_configuration/MessagingConfigurationPlugin.kt" />
         <option value="$PROJECT_DIR$/lib/messaging_configuration.dart" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="y" value="23" />
-    <option name="width" value="1366" />
-    <option name="height" value="640" />
+    <option name="x" value="43" />
+    <option name="y" value="45" />
+    <option name="width" value="1194" />
+    <option name="height" value="634" />
   </component>
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="AndroidView" />
       <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -92,14 +97,18 @@
             <path>
               <item name="messaging_configuration" type="b2602c69:ProjectViewProjectNode" />
               <item name="messaging_configuration" type="462c0819:PsiDirectoryNode" />
+              <item name="android" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="messaging_configuration" type="b2602c69:ProjectViewProjectNode" />
+              <item name="messaging_configuration" type="462c0819:PsiDirectoryNode" />
               <item name="lib" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="AndroidView" />
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -134,10 +143,9 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1366" y="-9" width="1280" height="777" extended-state="0" />
-    <editor active="true" />
+    <frame x="0" y="23" width="1280" height="678" extended-state="6" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26655897" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26655897" />
       <window_info id="Captures" order="1" side_tool="true" />
       <window_info id="Structure" order="2" side_tool="true" />
       <window_info id="Image Layers" order="3" />
@@ -152,7 +160,7 @@
       <window_info anchor="bottom" id="Android Profiler" order="3" show_stripe_button="false" />
       <window_info anchor="bottom" id="Logcat" order="4" />
       <window_info anchor="bottom" id="Debug" order="5" />
-      <window_info anchor="bottom" id="Terminal" order="6" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="6" visible="true" weight="0.32935154" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Find" order="9" />
@@ -236,10 +244,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/android/src/main/kotlin/wao/flutter/application/project/messaging_configuration/MessagingConfigurationPlugin.kt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="19" column="3" lean-forward="true" selection-start-line="19" selection-start-column="3" selection-end-line="19" selection-end-column="3" />
+        <state relative-caret-position="540">
+          <caret line="36" selection-start-line="36" selection-end-line="36" />
           <folding>
-            <element signature="e#104#249#0" expanded="true" />
+            <element signature="e#65#420#0" expanded="true" />
           </folding>
         </state>
       </provider>
