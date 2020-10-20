@@ -4,7 +4,23 @@ A new flutter plugin project.
 
 ## Getting Started
 
+
     import 'package:messaging_configuration/messaging_configuration.dart';
+    class MyApp extends StatelessWidget {
+      // This widget is the root of your application.
+      @override
+      Widget build(BuildContext context) {
+        changeStatusBarColor(Colors.transparent, true);
+        setupLanguage();
+        return OverlaySupport(
+          child: MaterialApp(
+          
+    Add OverlaySupport in main.dart or wrap your MaterialApp 
+    ..........
+    
+    
+    
+    
     
     void initState() {
        WidgetsBinding.instance.addPostFrameCallback((_) async {
