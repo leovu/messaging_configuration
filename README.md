@@ -4,6 +4,8 @@ A new flutter plugin project.
 
 ## Getting Started
 
+In Flutter, don't remove SharePreference with key : "PUSH_TOKEN_KEY" or clear all. If you clear all, get the key before clear and resave it to SharePrefernces.
+
 
     import 'package:messaging_configuration/messaging_configuration.dart';
     class MyApp extends StatelessWidget {
