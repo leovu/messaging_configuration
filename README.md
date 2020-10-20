@@ -21,7 +21,8 @@ In Flutter, don't remove SharePreference with key : "PUSH_TOKEN_KEY" or clear al
     ..........
     
     
-    
+    String deviceToken: await MessagingConfiguration.getPushToken(isAWS: true);
+    // If iOS use AWS , set isAWS = true, else it will use the Firebase setting
     
     
     void initState() {
