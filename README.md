@@ -91,7 +91,6 @@ In Flutter, don't remove SharePreference with key : "PUSH_TOKEN_KEY" or clear al
           didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
         ) -> Bool {
           GeneratedPluginRegistrant.register(with: self)
-          iOSIMEI.shared.setupAnalyzing(window: window)
           PushToken.shared.setupAnalyzing(window: window)
           createNotification(application)
           return super.application(application, didFinishLaunchingWithOptions: launchOptions)
