@@ -10,9 +10,12 @@ class MessagingConfiguration {
   static setUpMessagingConfiguration(BuildContext context,
       {Function(Map<String, dynamic>) onMessageCallback,
       bool isAWSNotification = true,
-      String iconApp}) async {
+      String iconApp,
+      Function notificationInForeground}) async {
     MessagingConfig.singleton.init(context, onMessageCallback,
-        iconApp: iconApp, isAWSNotification: isAWSNotification);
+        iconApp: iconApp,
+        isAWSNotification: isAWSNotification,
+        notificationInForeground: notificationInForeground);
   }
 
   static const iOSPushToken =

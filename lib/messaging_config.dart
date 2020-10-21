@@ -29,6 +29,7 @@ class MessagingConfig {
   MessagingConfig._internal();
 
   Function(Map<String, dynamic>) onMessageCallback;
+  Function notificationInForeground;
   String iconApp;
 
   final _platform = const MethodChannel('flutter.io/notificationTap');
@@ -36,10 +37,13 @@ class MessagingConfig {
   BuildContext context;
 
   init(BuildContext context, Function(Map<String, dynamic>) onMessageCallback,
-      {bool isAWSNotification = true, String iconApp}) {
+      {bool isAWSNotification = true,
+      String iconApp,
+      Function notificationInForeground}) {
     this.context = context;
     this.iconApp = iconApp;
     this.onMessageCallback = onMessageCallback;
+    this.notificationInForeground = notificationInForeground;
     if (Platform.isIOS && isAWSNotification) {
       setHandler();
     } else {
@@ -84,6 +88,9 @@ class MessagingConfig {
       String notiTitle = message["notification"]["title"].toString();
       String notiDes = message["notification"]["body"].toString();
       showAlertNotificationForeground(notiTitle, notiDes, message);
+    }
+    if (notificationInForeground != null) {
+      notificationInForeground();
     }
   }
 
