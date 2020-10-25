@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:audioplayers/audio_cache.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,11 +12,21 @@ class MessagingConfiguration {
       {Function(Map<String, dynamic>) onMessageCallback,
       bool isAWSNotification = true,
       String iconApp,
-      Function notificationInForeground}) async {
+      Function notificationInForeground,
+      bool isVibrate,
+      String sound,
+      int channelId}) async {
+    if (!kIsWeb) { return; }
+    AudioCache player = AudioCache();
+    String asset = await player.getAbsoluteUrl(sound);
     MessagingConfig.singleton.init(context, onMessageCallback,
         iconApp: iconApp,
         isAWSNotification: isAWSNotification,
-        notificationInForeground: notificationInForeground);
+        notificationInForeground: notificationInForeground,
+        isVibrate: isVibrate,
+        sound: (sound != null && channelId != null)
+            ? {"asset": asset, "channelId": channelId}
+            : null);
   }
 
   static const iOSPushToken =

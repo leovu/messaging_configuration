@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:messaging_configuration/messaging_configuration.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,10 +18,18 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    MessagingConfiguration.setUpMessagingConfiguration(context,
-        onMessageCallback: onMessageCallback,
-        isAWSNotification: true,
-        iconApp: "assets/logo/icon-app.png");
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      MessagingConfiguration.setUpMessagingConfiguration(context,
+          onMessageCallback: onMessageCallback,
+          isAWSNotification: true,
+          iconApp: "assets/logo/icon-app.png",
+          isVibrate: true,
+          sound: "audio/alert_tone.mp3",
+          channelId: 105);
+      MessagingConfiguration.getPushToken().then((value) {
+        print(value);
+      });
+    });
   }
 
   onMessageCallback(Map<String, dynamic> message) {
@@ -29,13 +38,15 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Text('Setup notification push'),
+    return OverlaySupport(
+      child: MaterialApp(
+        home: Scaffold(
+          appBar: AppBar(
+            title: const Text('Plugin example app'),
+          ),
+          body: Center(
+            child: Text('Setup notification push'),
+          ),
         ),
       ),
     );
