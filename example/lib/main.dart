@@ -27,7 +27,9 @@ class _MyAppState extends State<MyApp> {
           sound: "audio/alert_tone.mp3",
           channelId: 105);
       MessagingConfiguration.getPushToken().then((value) {
-        print(value);
+        Clipboard.setData(new ClipboardData(text: value)).then((_) {
+          print(value);
+        });
       });
     });
   }

@@ -32,9 +32,11 @@ class AudioPlayer {
         try {
             stopAudio(context)
             val audioManager: AudioManager? = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
-            audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC,
-                    audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
-                    AudioManager.FLAG_SHOW_UI)
+            if(audioManager!!.getStreamVolume(AudioManager.STREAM_MUSIC) < audioManager!!.getStreamMaxVolume(AudioManager.STREAM_MUSIC)/2) {
+                audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC,
+                        audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+                        AudioManager.FLAG_SHOW_UI)
+            }
             mMediaPlayer = MediaPlayer()
             mMediaPlayer.setDataSource(fileName)
             mMediaPlayer.isLooping = false
