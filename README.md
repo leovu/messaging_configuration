@@ -40,7 +40,8 @@ In Flutter, don't remove SharePreference with key : "PUSH_TOKEN_KEY" or clear al
             });
           });
           
-          // If you need sound, create folder asset in the same parent with lib folder. ex: project_name/assets/audio/alert_tone.mp3. You need to remove assets when put in the         the sound. If you forget, it will not have sound. Then in pubspec.yaml , you add : 
+          // If you need sound, create folder asset in the same parent with lib folder. ex: project_name/assets/audio/alert_tone.mp3. 
+          You need to remove assets when put in the sound. If you forget, it will not have sound. Then in pubspec.yaml , you add : 
                     assets:
                         - assets/audio/alert_tone.mp3
                         - assets/logo/icon-app.png
