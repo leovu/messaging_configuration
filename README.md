@@ -27,11 +27,24 @@ In Flutter, don't remove SharePreference with key : "PUSH_TOKEN_KEY" or clear al
     
     void initState() {
        WidgetsBinding.instance.addPostFrameCallback((_) async {
-      MessagingConfiguration.setUpMessagingConfiguration(context,
-          onMessageCallback: _notificationType,
-          isAWSNotification: true,
-          iconApp: 'assets/icons/logo-icon.png');
-      });
+          MessagingConfiguration.setUpMessagingConfiguration(context,
+              onMessageCallback: onMessageCallback,
+              isAWSNotification: true,
+              iconApp: "assets/logo/icon-app.png",
+              isVibrate: true,
+              sound: "audio/alert_tone.mp3",
+              channelId: 105);
+          MessagingConfiguration.getPushToken().then((value) {
+            Clipboard.setData(new ClipboardData(text: value)).then((_) {
+              print(value);
+            });
+          });
+          
+          // If you need sound, create folder asset in the same parent with lib folder. ex: project_name/assets/audio/alert_tone.mp3. You need to remove assets when put in the         the sound. If you forget, it will not have sound. Then in pubspec.yaml , you add : 
+                    assets:
+                        - assets/audio/alert_tone.mp3
+                        - assets/logo/icon-app.png
+
     }
     Future<void> _notificationType(Map<String, dynamic> message) async {
       if (message["data"]["notification_detail_id"] != null) {
