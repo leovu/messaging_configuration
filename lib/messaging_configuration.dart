@@ -17,8 +17,10 @@ class MessagingConfiguration {
       String sound,
       int channelId}) async {
     if (kIsWeb) { return; }
-    AudioCache player = AudioCache();
-    String asset = await player.getAbsoluteUrl(sound);
+    if (sound != null) {
+      AudioCache player = AudioCache();
+      String asset = await player.getAbsoluteUrl(sound);
+    }
     MessagingConfig.singleton.init(context, onMessageCallback,
         iconApp: iconApp,
         isAWSNotification: isAWSNotification,
