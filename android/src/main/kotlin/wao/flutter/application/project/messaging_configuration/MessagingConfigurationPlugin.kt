@@ -64,7 +64,7 @@ class MessagingConfigurationPlugin: FlutterPlugin, MethodCallHandler {
               .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
               .setUsage(AudioAttributes.USAGE_NOTIFICATION)
               .build()
-      channel.setSound(soundUri, att)
+      channel.setSound(null, null)
       val notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
       notificationManager.createNotificationChannel(channel)
       UtilProject.context = context
