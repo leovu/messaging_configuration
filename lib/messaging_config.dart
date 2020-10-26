@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'dart:ui';
+import 'package:vibration/vibration.dart';
+import 'package:audioplayers/audio_cache.dart';
 
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
@@ -31,6 +33,8 @@ class MessagingConfig {
   Function(Map<String, dynamic>) onMessageCallback;
   Function notificationInForeground;
   String iconApp;
+  bool isVibrate;
+  Map<String, dynamic> sound;
 
   final _platform = const MethodChannel('flutter.io/notificationTap');
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
@@ -39,11 +43,24 @@ class MessagingConfig {
   init(BuildContext context, Function(Map<String, dynamic>) onMessageCallback,
       {bool isAWSNotification = true,
       String iconApp,
-      Function notificationInForeground}) {
+      Function notificationInForeground,
+      bool isVibrate = false,
+      Map<String, dynamic> sound}) {
     this.context = context;
     this.iconApp = iconApp;
     this.onMessageCallback = onMessageCallback;
     this.notificationInForeground = notificationInForeground;
+    this.isVibrate = isVibrate;
+    this.sound = sound;
+    if (sound != null) {
+      if (Platform.isAndroid) {
+        const audioSoundSetup =
+            const MethodChannel('flutter.io/audioSoundSetup');
+        audioSoundSetup
+            .invokeMethod('setupSound', sound)
+            .then((value) => print(value));
+      }
+    }
     if (Platform.isIOS && isAWSNotification) {
       setHandler();
     } else {
@@ -87,6 +104,13 @@ class MessagingConfig {
     if (message.containsKey("notification")) {
       String notiTitle = message["notification"]["title"].toString();
       String notiDes = message["notification"]["body"].toString();
+      if (await Vibration.hasVibrator() && isVibrate) {
+        if (Platform.isIOS) {
+          AudioCache player = AudioCache();
+          player.play(sound["asset"]);
+        }
+        Vibration.vibrate();
+      }
       showAlertNotificationForeground(notiTitle, notiDes, message);
     }
     if (notificationInForeground != null) {
