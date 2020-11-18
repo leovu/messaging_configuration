@@ -37,9 +37,8 @@ class MessagingConfig {
 
   final _platform = const MethodChannel('flutter.io/notificationTap');
   final _vibrate = const MethodChannel('flutter.io/vibrate');
-  FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   BuildContext context;
-
+  FirebaseMessaging _messaging;
   init(BuildContext context, Function(Map<String, dynamic>) onMessageCallback,
       {bool isAWSNotification = true,
       String iconApp,
@@ -52,6 +51,7 @@ class MessagingConfig {
     this.notificationInForeground = notificationInForeground;
     this.isVibrate = isVibrate;
     this.sound = sound;
+    _messaging = FirebaseMessaging.instance;
     if (sound != null) {
       if (Platform.isAndroid) {
         const audioSoundSetup =
@@ -64,16 +64,12 @@ class MessagingConfig {
     if (Platform.isIOS && isAWSNotification) {
       setHandler();
     } else {
-      _firebaseMessaging.configure(
-          onMessage: inAppMessageHandler,
-          onLaunch: (Map<String, dynamic> message) {
-            this.myBackgroundMessageHandler(message, "onLaunch");
-            return;
-          },
-          onResume: (Map<String, dynamic> message) {
-            this.myBackgroundMessageHandler(message, "onResume");
-            return;
-          });
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        inAppMessageHandler(message.data);
+      });
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        myBackgroundMessageHandler(message.data);
+      });
     }
   }
 
@@ -93,7 +89,7 @@ class MessagingConfig {
         print(methodCall.arguments);
         Map<String, dynamic> message =
             Map<String, dynamic>.from(methodCall.arguments);
-        this.myBackgroundMessageHandler(message, "onLaunch");
+        this.myBackgroundMessageHandler(message);
         return null;
       default:
         throw PlatformException(code: 'notimpl', message: 'not implemented');
@@ -107,13 +103,11 @@ class MessagingConfig {
     if (message.containsKey("notification")) {
       notiTitle = message["notification"]["title"].toString();
       notiDes = message["notification"]["body"].toString();
-
-    }
-    else {
+    } else {
       notiTitle = message["aps"]["alert"]["title"].toString();
       notiDes = message["aps"]["alert"]["body"].toString();
     }
-    if(notiTitle != null && notiDes != null) {
+    if (notiTitle != null && notiDes != null) {
       showAlertNotificationForeground(notiTitle, notiDes, message);
       try {
         if (isVibrate) {
@@ -152,7 +146,7 @@ class MessagingConfig {
   }
 
   Future<dynamic> myBackgroundMessageHandler(
-      Map<String, dynamic> message, String type) async {
+      Map<String, dynamic> message) async {
     if (onMessageCallback != null) {
       onMessageCallback(message);
     }
