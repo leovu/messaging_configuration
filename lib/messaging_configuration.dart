@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:audioplayers/audio_cache.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,6 +17,7 @@ class MessagingConfiguration {
       bool isVibrate,
       String sound,
       int channelId}) async {
+    await Firebase.initializeApp();
     if (kIsWeb) { return; }
     String asset;
     if (sound != null) {
@@ -40,6 +42,7 @@ class MessagingConfiguration {
   static const iOSPushToken =
       const MethodChannel('flutter.io/receivePushNotificationToken');
   static Future<String> getPushToken({bool isAWS = false}) async {
+    await Firebase.initializeApp();
     String deviceToken = "";
     if (!kIsWeb) {
       if (Platform.isIOS && isAWS) {
