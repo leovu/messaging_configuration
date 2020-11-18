@@ -13,8 +13,8 @@ dependencies:
     sdk: flutter
   firebase_messaging: ^7.0.3
   overlay_support: ^1.0.5
-  vibration: ^1.7.1
-  audioplayers: ^0.16.1
+  vibration: ^1.7.2
+  audioplayers: ^0.16.2
 
 dev_dependencies:
   flutter_test:

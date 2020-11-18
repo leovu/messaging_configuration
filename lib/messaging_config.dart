@@ -104,14 +104,20 @@ class MessagingConfig {
     if (message.containsKey("notification")) {
       String notiTitle = message["notification"]["title"].toString();
       String notiDes = message["notification"]["body"].toString();
-      if (await Vibration.hasVibrator() && isVibrate) {
-        if (Platform.isIOS) {
-          AudioCache player = AudioCache();
-          player.play(sound["asset"]);
-        }
-        Vibration.vibrate();
-      }
       showAlertNotificationForeground(notiTitle, notiDes, message);
+      try {
+        if (isVibrate) {
+          Vibration.vibrate();
+        }
+        if (Platform.isIOS) {
+          if (sound != null) {
+            AudioCache player = AudioCache();
+            player.play(sound["asset"]);
+          }
+        }
+      } catch (e) {
+        print(e);
+      }
     }
     if (notificationInForeground != null) {
       notificationInForeground();
