@@ -51,7 +51,7 @@ class MessagingConfiguration {
           deviceToken = "";
         }
       } else {
-        deviceToken = await FirebaseMessaging().getToken() ?? "";
+        deviceToken = await FirebaseMessaging.instance.getToken() ?? "";
       }
     }
     return deviceToken;
