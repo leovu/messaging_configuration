@@ -20,7 +20,8 @@ class _MyAppState extends State<MyApp> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       MessagingConfiguration.setUpMessagingConfiguration(context,
           onMessageCallback: onMessageCallback,
-          isAWSNotification: true,
+          notificationInForeground: _notificationInForeground,
+          isAWSNotification: false,
           iconApp: "assets/logo/icon-app.png",
           isVibrate: true,
           sound: "audio/alert_tone.mp3",
@@ -35,6 +36,9 @@ class _MyAppState extends State<MyApp> {
 
   onMessageCallback(Map<String, dynamic> message) {
     print(message);
+  }
+  _notificationInForeground() {
+    print("_notificationInForeground");
   }
 
   @override

@@ -8,6 +8,8 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import androidx.annotation.NonNull
 import io.flutter.FlutterInjector
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -23,6 +25,7 @@ class MessagingConfigurationPlugin: FlutterPlugin, MethodCallHandler {
   /// This local reference serves to register the plugin with the Flutter Engine and unregister it
   /// when the Flutter Engine is detached from the Activity
   private lateinit var channel : MethodChannel
+  private lateinit var vibrateChannel : MethodChannel
   private lateinit var context: Context
   private lateinit var assetManager: AssetManager
   private lateinit var player: MediaPlayer
@@ -32,6 +35,8 @@ class MessagingConfigurationPlugin: FlutterPlugin, MethodCallHandler {
     assetManager = flutterPluginBinding.applicationContext.assets
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter.io/audioSoundSetup")
     channel.setMethodCallHandler(this)
+    vibrateChannel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter.io/vibrate")
+    vibrateChannel.setMethodCallHandler(this)
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -44,6 +49,15 @@ class MessagingConfigurationPlugin: FlutterPlugin, MethodCallHandler {
         createChannel(dict["asset"].toString(),dict["channelId"].toString())
         result.success("Android Setup Sound completed")
       }
+    }
+    else if (call.method == "vibrate") {
+      val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+      if (Build.VERSION.SDK_INT >= 26) {
+        vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+      } else {
+        vibrator.vibrate(200)
+      }
+      result.success("vibrate completed")
     }
     else {
       result.notImplemented()

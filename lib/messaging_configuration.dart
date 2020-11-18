@@ -20,7 +20,12 @@ class MessagingConfiguration {
     String asset;
     if (sound != null) {
       AudioCache player = AudioCache();
-      asset = await player.getAbsoluteUrl(sound);
+      if(Platform.isIOS) {
+        asset = sound;
+      }
+      else {
+        asset = await player.getAbsoluteUrl(sound);
+      }
     }
     MessagingConfig.singleton.init(context, onMessageCallback,
         iconApp: iconApp,

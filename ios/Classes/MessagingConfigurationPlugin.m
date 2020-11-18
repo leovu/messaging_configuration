@@ -1,17 +1,26 @@
 #import "MessagingConfigurationPlugin.h"
+#import <AudioToolbox/AudioToolbox.h>
 
 @implementation MessagingConfigurationPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
   FlutterMethodChannel* channel = [FlutterMethodChannel
-      methodChannelWithName:@"messaging_configuration"
+      methodChannelWithName:@"flutter.io/vibrate"
             binaryMessenger:[registrar messenger]];
   MessagingConfigurationPlugin* instance = [[MessagingConfigurationPlugin alloc] init];
   [registrar addMethodCallDelegate:instance channel:channel];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-  if ([@"getPlatformVersion" isEqualToString:call.method]) {
-    result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
+  if ([@"vibrate" isEqualToString:call.method]) {
+    if([[UIDevice currentDevice].model isEqualToString:@"iPhone"])
+    {
+       AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+    }
+    else
+    {
+       AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
+    }
+    result(@"vibrate completed");
   } else {
     result(FlutterMethodNotImplemented);
   }

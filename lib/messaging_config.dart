@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'dart:ui';
-import 'package:vibration/vibration.dart';
 import 'package:audioplayers/audio_cache.dart';
 
 class HexColor extends Color {
@@ -37,6 +36,7 @@ class MessagingConfig {
   Map<String, dynamic> sound;
 
   final _platform = const MethodChannel('flutter.io/notificationTap');
+  final _vibrate = const MethodChannel('flutter.io/vibrate');
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   BuildContext context;
 
@@ -101,13 +101,23 @@ class MessagingConfig {
   }
 
   Future<dynamic> inAppMessageHandler(Map<String, dynamic> message) async {
+    String notiTitle;
+    String notiDes;
+    print(message);
     if (message.containsKey("notification")) {
-      String notiTitle = message["notification"]["title"].toString();
-      String notiDes = message["notification"]["body"].toString();
+      notiTitle = message["notification"]["title"].toString();
+      notiDes = message["notification"]["body"].toString();
+
+    }
+    else {
+      notiTitle = message["aps"]["alert"]["title"].toString();
+      notiDes = message["aps"]["alert"]["body"].toString();
+    }
+    if(notiTitle != null && notiDes != null) {
       showAlertNotificationForeground(notiTitle, notiDes, message);
       try {
         if (isVibrate) {
-          Vibration.vibrate();
+          _vibrate.invokeMethod('vibrate');
         }
         if (Platform.isIOS) {
           if (sound != null) {
