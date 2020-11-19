@@ -40,7 +40,7 @@ class MessagingConfiguration {
   }
 
   static const iOSPushToken =
-  const MethodChannel('flutter.io/receivePushNotificationToken');
+  const MethodChannel('flutter.io/awsMessaging');
   static Future<String> getPushToken({bool isAWS = false}) async {
     await Firebase.initializeApp();
     String deviceToken = "";
@@ -48,7 +48,7 @@ class MessagingConfiguration {
       if (Platform.isIOS && isAWS) {
         try {
           deviceToken =
-          await iOSPushToken.invokeMethod('receivePushNotificationToken');
+          await iOSPushToken.invokeMethod('getToken');
         } on PlatformException {
           print("Error receivePushNotificationToken");
           deviceToken = "";
