@@ -35,27 +35,26 @@ class MessagingConfig {
   bool isVibrate;
   Map<String, dynamic> sound;
 
-  final _platform = const MethodChannel('flutter.io/notificationTap');
+  final _awsMessaging = const MethodChannel('flutter.io/awsMessaging');
   final _vibrate = const MethodChannel('flutter.io/vibrate');
   BuildContext context;
-  FirebaseMessaging _messaging;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   init(BuildContext context, Function(Map<String, dynamic>) onMessageCallback,
       {bool isAWSNotification = true,
-      String iconApp,
-      Function notificationInForeground,
-      bool isVibrate = false,
-      Map<String, dynamic> sound}) {
+        String iconApp,
+        Function notificationInForeground,
+        bool isVibrate = false,
+        Map<String, dynamic> sound}) {
     this.context = context;
     this.iconApp = iconApp;
     this.onMessageCallback = onMessageCallback;
     this.notificationInForeground = notificationInForeground;
     this.isVibrate = isVibrate;
     this.sound = sound;
-    _messaging = FirebaseMessaging.instance;
     if (sound != null) {
       if (Platform.isAndroid) {
         const audioSoundSetup =
-            const MethodChannel('flutter.io/audioSoundSetup');
+        const MethodChannel('flutter.io/audioSoundSetup');
         audioSoundSetup
             .invokeMethod('setupSound', sound)
             .then((value) => print(value));
@@ -64,17 +63,25 @@ class MessagingConfig {
     if (Platform.isIOS && isAWSNotification) {
       setHandler();
     } else {
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        inAppMessageHandler(message.data);
-      });
-      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        myBackgroundMessageHandler(message.data);
-      });
+      _firebaseMessaging.configure(
+        onMessage: (Map<String, dynamic> message) async {
+          print("onMessage: $message");
+          inAppMessageHandler(message);
+        },
+        onLaunch: (Map<String, dynamic> message) async {
+          print("onLaunch: $message");
+          myBackgroundMessageHandler(message);
+        },
+        onResume: (Map<String, dynamic> message) async {
+          print("onResume: $message");
+          myBackgroundMessageHandler(message);
+        },
+      );
     }
   }
 
   void setHandler() {
-    _platform.setMethodCallHandler(methodCallHandler);
+    _awsMessaging.setMethodCallHandler(methodCallHandler);
   }
 
   Future<dynamic> methodCallHandler(MethodCall methodCall) async {
@@ -82,13 +89,13 @@ class MessagingConfig {
       case 'onMessage':
         print(methodCall.arguments);
         Map<String, dynamic> message =
-            Map<String, dynamic>.from(methodCall.arguments);
+        Map<String, dynamic>.from(methodCall.arguments);
         this.inAppMessageHandler(message);
         return null;
       case 'onLaunch':
         print(methodCall.arguments);
         Map<String, dynamic> message =
-            Map<String, dynamic>.from(methodCall.arguments);
+        Map<String, dynamic>.from(methodCall.arguments);
         this.myBackgroundMessageHandler(message);
         return null;
       default:
@@ -220,7 +227,7 @@ class BannerNotificationState extends State<BannerNotification> {
                           child: widget.iconApp == null
                               ? Container()
                               : Image.asset(widget.iconApp,
-                                  fit: BoxFit.contain),
+                              fit: BoxFit.contain),
                         ),
                       ),
                     ),

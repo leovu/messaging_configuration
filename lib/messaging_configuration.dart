@@ -5,18 +5,18 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:messaging_configuration/messaging_config.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:messaging_configuration/messaging_config.dart';
 
 class MessagingConfiguration {
   static setUpMessagingConfiguration(BuildContext context,
       {Function(Map<String, dynamic>) onMessageCallback,
-      bool isAWSNotification = true,
-      String iconApp,
-      Function notificationInForeground,
-      bool isVibrate,
-      String sound,
-      int channelId}) async {
+        bool isAWSNotification = true,
+        String iconApp,
+        Function notificationInForeground,
+        bool isVibrate,
+        String sound,
+        int channelId}) async {
     await Firebase.initializeApp();
     if (kIsWeb) { return; }
     String asset;
@@ -40,7 +40,7 @@ class MessagingConfiguration {
   }
 
   static const iOSPushToken =
-      const MethodChannel('flutter.io/receivePushNotificationToken');
+  const MethodChannel('flutter.io/receivePushNotificationToken');
   static Future<String> getPushToken({bool isAWS = false}) async {
     await Firebase.initializeApp();
     String deviceToken = "";
@@ -48,13 +48,13 @@ class MessagingConfiguration {
       if (Platform.isIOS && isAWS) {
         try {
           deviceToken =
-              await iOSPushToken.invokeMethod('receivePushNotificationToken');
+          await iOSPushToken.invokeMethod('receivePushNotificationToken');
         } on PlatformException {
           print("Error receivePushNotificationToken");
           deviceToken = "";
         }
       } else {
-        deviceToken = await FirebaseMessaging.instance.getToken() ?? "";
+        deviceToken = await FirebaseMessaging().getToken() ?? "";
       }
     }
     return deviceToken;

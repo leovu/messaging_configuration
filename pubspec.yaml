@@ -11,10 +11,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  firebase_messaging: ^8.0.0-dev.8
+  firebase_messaging: ^7.0.3
   overlay_support: ^1.0.5
   audioplayers: ^0.16.2
-  firebase_core: ^0.5.2
 
 dev_dependencies:
   flutter_test:
