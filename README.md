@@ -92,7 +92,7 @@ In Flutter, don't remove SharePreference with key : "PUSH_TOKEN_KEY" or clear al
   - Upload your APNs certificate
   
  ******AWS Push******
- 
+ Copy file PushToken in Example and add into your project. 
  In AppDelegate: 
  
       import UIKit
@@ -105,114 +105,8 @@ In Flutter, don't remove SharePreference with key : "PUSH_TOKEN_KEY" or clear al
           didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
         ) -> Bool {
           GeneratedPluginRegistrant.register(with: self)
-          PushToken.shared.setupAnalyzing(window: window)
-          createNotification(application)
+          PushToken.shared.setupAnalyzing(window: window, application: application)
           return super.application(application, didFinishLaunchingWithOptions: launchOptions)
         }
-          private func createNotification(_ application: UIApplication) {
-              if #available(iOS 10.0, *) {
-                  UNUserNotificationCenter.current().delegate = self
-                  let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-                  UNUserNotificationCenter.current().requestAuthorization(
-                      options: authOptions,
-                      completionHandler: {_, _ in })
-              } else {
-                  let settings: UIUserNotificationSettings =
-                      UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
-                  application.registerUserNotificationSettings(settings)
-              }
-              application.registerForRemoteNotifications()
-          }
-
-          // Get Push Notification Token
-          override func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-              let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
-              // Save push notification token to share pref -- clear prefs, ios must resaved by flutter. Because this function usually called 1 time.
-              Common.PUSH_TOKEN = token
-              print(token)
-          }
-
-
-          // Start
-          // When have notification from server, call Flutter function
-          @available(iOS 10.0, *)
-          // When foreground
-          override func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-              print(notification.request.content.userInfo)
-              callbackFlutterNotifcation(notification.request.content.userInfo)
-          }
-          // When background/kill app
-          override func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-              print(userInfo)
-              callbackFlutterNotifcation(userInfo)
-              completionHandler(UIBackgroundFetchResult.newData)
-          }
-          // When background/kill app
-          override func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any]) {
-              print(userInfo)
-              callbackFlutterNotifcation(userInfo)
-          }
-          // End
-          @available(iOS 10.0, *)
-          override func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-              callbackFlutterNotifcation(response.notification.request.content.userInfo)
-          }
-
-          // Parse value data from notification before push to Flutter
-          func callbackFlutterNotifcation(_ userInfo:[AnyHashable : Any]) {
-              // [Anyhashable:Any] -> Map<String,dynamic>
-              var dictionary:[String:Any] = [:]
-              if let controller = window.rootViewController as? FlutterViewController , let dict = userInfo as? [String:Any] {
-                  dictionary = dict
-                  // iOS : notification - aps.
-                  if let aps:[String:Any] = dict["aps"] as? [String : Any] {
-                      dictionary["notification"] = aps["alert"]
-                      dictionary.removeValue(forKey: "aps")
-                  }
-                  let state = UIApplication.shared.applicationState
-                  let channel =  FlutterMethodChannel(name: "flutter.io/notificationTap", binaryMessenger: controller.binaryMessenger)
-                  if state == .active {
-                      channel.invokeMethod("onMessage", arguments: dictionary)
-                  } else {
-                      channel.invokeMethod("onLaunch", arguments: dictionary)
-                  }
-              }
-          }
     }
-   
-      let PUSH_TOKEN_KEY = "flutter.PUSH_TOKEN_KEY"
-      class Common {
-          static let shared = Common()
-          static var PUSH_TOKEN: String {
-              get {
-                  return UserDefaults.standard.string(forKey: PUSH_TOKEN_KEY) ?? ""
-              }set {
-                  UserDefaults.standard.set(newValue, forKey: PUSH_TOKEN_KEY)
-              }
-          }
-          var deviceUIID : String {
-              return UIDevice.current.identifierForVendor!.uuidString
-          }
-      }
-
-      class PushToken {
-          func receivePushNotificationToken(result: FlutterResult) {
-              result(Common.PUSH_TOKEN)
-          }
-          static let shared = PushToken()
-          func setupAnalyzing(window:UIWindow) {
-              let controller : FlutterViewController = window.rootViewController as! FlutterViewController
-              let channel = FlutterMethodChannel(name: "flutter.io/receivePushNotificationToken",
-                                                 binaryMessenger: controller.binaryMessenger)
-              channel.setMethodCallHandler({
-                  [weak self] (call: FlutterMethodCall, result: @escaping FlutterResult) -> Void in
-                  guard call.method == "receivePushNotificationToken" else {
-                      result(FlutterMethodNotImplemented)
-                      return
-                  }
-                  self?.receivePushNotificationToken(result: result)
-              })
-          }
-      }
-
     
