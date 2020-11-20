@@ -2,18 +2,14 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import <UserNotifications/UserNotifications.h>
 
-#if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
-@interface MessagingConfigurationPlugin () <UIApplicationDelegate>
+@interface MessagingConfigurationPlugin ()
 @end
-#endif
-static NSObject<FlutterPluginRegistrar> *_registrar;
+
 @implementation MessagingConfigurationPlugin {
   FlutterMethodChannel *_channel;
-  NSDictionary *_launchNotification;
 }
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    _registrar = registrar;
     FlutterMethodChannel* channel = [FlutterMethodChannel
       methodChannelWithName:@"flutter.io/vibrate"
             binaryMessenger:[registrar messenger]];
@@ -75,24 +71,7 @@ static NSObject<FlutterPluginRegistrar> *_registrar;
     return [token copy];
 }
 
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler API_AVAILABLE(ios(10.0)){
-    [self callbackFlutterNotifiation:notification.request.content.userInfo];
-}
-
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-    [self callbackFlutterNotifiation:userInfo];
-    completionHandler(UIBackgroundFetchResultNoData);
-}
-
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-    [self callbackFlutterNotifiation:userInfo];
-}
-
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler  API_AVAILABLE(ios(10.0)){
-    [self callbackFlutterNotifiation:response.notification.request.content.userInfo];
-}
-
-- (void)callbackFlutterNotifiation:(NSDictionary *)userInfo {
+- (void)callbackFlutterNotification:(NSDictionary *)userInfo {
     NSMutableDictionary *response = [NSMutableDictionary new];
     [response setDictionary:userInfo];
     @try {
@@ -110,13 +89,6 @@ static NSObject<FlutterPluginRegistrar> *_registrar;
     } else {
         [_channel invokeMethod:@"onLaunch" arguments:response];
     }
-}
-
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary<UIApplicationLaunchOptionsKey,id> *)launchOptions{
-    if (launchOptions != nil) {
-      _launchNotification = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
-    }
-    return YES;
 }
 
 @end
