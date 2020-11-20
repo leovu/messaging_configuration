@@ -6,12 +6,14 @@
 @interface MessagingConfigurationPlugin () <UIApplicationDelegate>
 @end
 #endif
-
+static NSObject<FlutterPluginRegistrar> *_registrar;
 @implementation MessagingConfigurationPlugin {
   FlutterMethodChannel *_channel;
+  NSDictionary *_launchNotification;
 }
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
+    _registrar = registrar;
     FlutterMethodChannel* channel = [FlutterMethodChannel
       methodChannelWithName:@"flutter.io/vibrate"
             binaryMessenger:[registrar messenger]];
@@ -23,8 +25,8 @@
               binaryMessenger:[registrar messenger]];
     MessagingConfigurationPlugin *awsInstance =
         [[MessagingConfigurationPlugin alloc] initWithChannel:channel];
-    [registrar addApplicationDelegate:awsInstance];
     [registrar addMethodCallDelegate:awsInstance channel:awsChannel];
+    [registrar addApplicationDelegate:awsInstance];
 }
 
 - (instancetype)initWithChannel:(FlutterMethodChannel *)channel {
@@ -68,7 +70,7 @@
     const char *data = [deviceToken bytes];
     NSMutableString *token = [NSMutableString string];
     for (NSUInteger i = 0; i < [deviceToken length]; i++) {
-        [token appendFormat:@"%02.2hhX", data[i]];
+        [token appendFormat:@"%02.2hhx", data[i]];
     }
     return [token copy];
 }
@@ -79,6 +81,7 @@
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
     [self callbackFlutterNotifiation:userInfo];
+    completionHandler(UIBackgroundFetchResultNoData);
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
@@ -101,12 +104,19 @@
      @catch (NSException *exception) {
         NSLog(@"%@", exception.reason);
      }
-    if (UIApplication.sharedApplication.applicationState == UIApplicationStateActive) {
+    UIApplicationState state = [[UIApplication sharedApplication] applicationState];
+    if (state == UIApplicationStateActive) {
         [_channel invokeMethod:@"onMessage" arguments:response];
-    }
-    else {
+    } else {
         [_channel invokeMethod:@"onLaunch" arguments:response];
     }
+}
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary<UIApplicationLaunchOptionsKey,id> *)launchOptions{
+    if (launchOptions != nil) {
+      _launchNotification = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
+    }
+    return YES;
 }
 
 @end
