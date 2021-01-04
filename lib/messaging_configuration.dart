@@ -34,6 +34,7 @@ class MessagingConfiguration {
         iconApp: iconApp,
         isAWSNotification: isAWSNotification,
         notificationInForeground: notificationInForeground,
+        onBackgroundMessageHandler:onBackgroundMessageHandler,
         isVibrate: isVibrate,
         sound: (asset != null && channelId != null)
             ? {"asset": asset, "channelId": channelId}
