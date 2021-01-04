@@ -30,6 +30,7 @@ class MessagingConfig {
   MessagingConfig._internal();
 
   Function(Map<String, dynamic>) onMessageCallback;
+  dynamic onBackgroundMessageHandler;
   Function notificationInForeground;
   String iconApp;
   bool isVibrate;
@@ -43,12 +44,14 @@ class MessagingConfig {
       {bool isAWSNotification = true,
         String iconApp,
         Function notificationInForeground,
+        dynamic onBackgroundMessageHandler,
         bool isVibrate = false,
         Map<String, dynamic> sound}) {
     this.context = context;
     this.iconApp = iconApp;
     this.onMessageCallback = onMessageCallback;
     this.notificationInForeground = notificationInForeground;
+    this.onBackgroundMessageHandler = onBackgroundMessageHandler;
     this.isVibrate = isVibrate;
     this.sound = sound;
     if (sound != null) {
@@ -72,6 +75,7 @@ class MessagingConfig {
           print("onLaunch: $message");
           myBackgroundMessageHandler(message);
         },
+        onBackgroundMessage: onBackgroundMessageHandler,
         onResume: (Map<String, dynamic> message) async {
           print("onResume: $message");
           myBackgroundMessageHandler(message);

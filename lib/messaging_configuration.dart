@@ -14,6 +14,7 @@ class MessagingConfiguration {
         bool isAWSNotification = true,
         String iconApp,
         Function notificationInForeground,
+        dynamic onBackgroundMessageHandler,
         bool isVibrate,
         String sound,
         int channelId}) async {
