@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:audioplayers/audio_cache.dart';
+// import 'package:audioplayers/audio_cache.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -22,13 +22,13 @@ class MessagingConfiguration {
     if (kIsWeb) { return; }
     String asset;
     if (sound != null) {
-      AudioCache player = AudioCache();
-      if(Platform.isIOS) {
-        asset = sound;
-      }
-      else {
-        asset = await player.getAbsoluteUrl(sound);
-      }
+      // AudioCache player = AudioCache();
+      // if(Platform.isIOS) {
+      //   asset = sound;
+      // }
+      // else {
+      //   asset = await player.getAbsoluteUrl(sound);
+      // }
     }
     MessagingConfig.singleton.init(context, onMessageCallback,
         iconApp: iconApp,
@@ -56,7 +56,7 @@ class MessagingConfiguration {
           deviceToken = "";
         }
       } else {
-        deviceToken = await FirebaseMessaging().getToken() ?? "";
+        deviceToken = await FirebaseMessaging.instance.getToken();
       }
     }
     return deviceToken;

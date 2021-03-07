@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'dart:ui';
-import 'package:audioplayers/audio_cache.dart';
 
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
@@ -39,7 +38,6 @@ class MessagingConfig {
   final _awsMessaging = const MethodChannel('flutter.io/awsMessaging');
   final _vibrate = const MethodChannel('flutter.io/vibrate');
   BuildContext context;
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   init(BuildContext context, Function(Map<String, dynamic>) onMessageCallback,
       {bool isAWSNotification = true,
         String iconApp,
@@ -66,21 +64,18 @@ class MessagingConfig {
     if (Platform.isIOS && isAWSNotification) {
       setHandler();
     } else {
-      _firebaseMessaging.configure(
-        onMessage: (Map<String, dynamic> message) async {
-          print("onMessage: $message");
-          inAppMessageHandler(message);
-        },
-        onLaunch: (Map<String, dynamic> message) async {
-          print("onLaunch: $message");
-          myBackgroundMessageHandler(message);
-        },
-        onBackgroundMessage: onBackgroundMessageHandler,
-        onResume: (Map<String, dynamic> message) async {
-          print("onResume: $message");
-          myBackgroundMessageHandler(message);
-        },
-      );
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        print("onMessage: $message");
+        inAppMessageHandler(message.data);
+      });
+      FirebaseMessaging.onBackgroundMessage((RemoteMessage message) {
+        print("onBackground: $message");
+        return myBackgroundMessageHandler(message.data);
+      });
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        print("onResume: $message");
+        myBackgroundMessageHandler(message.data);
+      });
     }
   }
 
@@ -124,12 +119,12 @@ class MessagingConfig {
         if (isVibrate) {
           _vibrate.invokeMethod('vibrate');
         }
-        if (Platform.isIOS) {
-          if (sound != null) {
-            AudioCache player = AudioCache();
-            player.play(sound["asset"]);
-          }
-        }
+        // if (Platform.isIOS) {
+        //   if (sound != null) {
+        //     AudioCache player = AudioCache();
+        //     player.play(sound["asset"]);
+        //   }
+        // }
       } catch (e) {
         print(e);
       }
