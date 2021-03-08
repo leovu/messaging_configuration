@@ -66,7 +66,7 @@ class MessagingConfig {
     } else {
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         print("onMessage: $message");
-        inAppMessageHandler(message.data);
+        inAppMessageHandlerRemoteMessage(message);
       });
       // FirebaseMessaging.onBackgroundMessage((RemoteMessage message) {
       //   print("onBackground: $message");
@@ -74,7 +74,7 @@ class MessagingConfig {
       // });
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         print("onResume: $message");
-        myBackgroundMessageHandler(message.data);
+        inAppMessageHandlerRemoteMessage(message);
       });
     }
   }
@@ -102,9 +102,41 @@ class MessagingConfig {
     }
   }
 
-  Future<dynamic> inAppMessageHandler(RemoteMessage message) async {
+  Future<dynamic> inAppMessageHandlerRemoteMessage(RemoteMessage message) async {
     if (message.notification.title != null && message.notification.body != null) {
-      showAlertNotificationForeground(message.notification.title, message.notification.body, message.data);
+      showAlertNotificationForeground(
+          message.notification.title, message.notification.body, message.data);
+      try {
+        if (isVibrate) {
+          _vibrate.invokeMethod('vibrate');
+        }
+        // if (Platform.isIOS) {
+        //   if (sound != null) {
+        //     AudioCache player = AudioCache();
+        //     player.play(sound["asset"]);
+        //   }
+        // }
+      } catch (e) {
+        print(e);
+      }
+    }
+    if (notificationInForeground != null) {
+      notificationInForeground();
+    }
+  }
+  Future<dynamic> inAppMessageHandler(Map<String, dynamic> message) async {
+    String notiTitle;
+    String notiDes;
+    print(message);
+    if (message.containsKey("notification")) {
+      notiTitle = message["notification"]["title"].toString();
+      notiDes = message["notification"]["body"].toString();
+    } else {
+      notiTitle = message["aps"]["alert"]["title"].toString();
+      notiDes = message["aps"]["alert"]["body"].toString();
+    }
+    if (notiTitle != null && notiDes != null) {
+      showAlertNotificationForeground(notiTitle, notiDes, message);
       try {
         if (isVibrate) {
           _vibrate.invokeMethod('vibrate');
