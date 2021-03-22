@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'package:audioplayers/audio_cache.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'dart:ui';
+import 'package:firebase_core/firebase_core.dart';
 
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
@@ -44,7 +46,7 @@ class MessagingConfig {
         Function notificationInForeground,
         dynamic onBackgroundMessageHandler,
         bool isVibrate = false,
-        Map<String, dynamic> sound}) {
+        Map<String, dynamic> sound}) async {
     this.context = context;
     this.iconApp = iconApp;
     this.onMessageCallback = onMessageCallback;
@@ -64,14 +66,11 @@ class MessagingConfig {
     if (Platform.isIOS && isAWSNotification) {
       setHandler();
     } else {
+      await Firebase.initializeApp();
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         print("onMessage: $message");
         inAppMessageHandlerRemoteMessage(message);
       });
-      // FirebaseMessaging.onBackgroundMessage((RemoteMessage message) {
-      //   print("onBackground: $message");
-      //   return myBackgroundMessageHandler(message.data);
-      // });
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         print("onResume: $message");
         inAppMessageHandlerRemoteMessage(message);
@@ -110,12 +109,12 @@ class MessagingConfig {
         if (isVibrate) {
           _vibrate.invokeMethod('vibrate');
         }
-        // if (Platform.isIOS) {
-        //   if (sound != null) {
-        //     AudioCache player = AudioCache();
-        //     player.play(sound["asset"]);
-        //   }
-        // }
+        if (Platform.isIOS) {
+          if (sound != null) {
+            AudioCache player = AudioCache();
+            player.play(sound["asset"]);
+          }
+        }
       } catch (e) {
         print(e);
       }
@@ -141,12 +140,12 @@ class MessagingConfig {
         if (isVibrate) {
           _vibrate.invokeMethod('vibrate');
         }
-        // if (Platform.isIOS) {
-        //   if (sound != null) {
-        //     AudioCache player = AudioCache();
-        //     player.play(sound["asset"]);
-        //   }
-        // }
+        if (Platform.isIOS) {
+          if (sound != null) {
+            AudioCache player = AudioCache();
+            player.play(sound["asset"]);
+          }
+        }
       } catch (e) {
         print(e);
       }
