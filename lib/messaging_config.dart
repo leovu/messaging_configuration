@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'dart:ui';
-import 'package:firebase_core/firebase_core.dart';
 
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
@@ -46,7 +45,7 @@ class MessagingConfig {
         Function notificationInForeground,
         dynamic onBackgroundMessageHandler,
         bool isVibrate = false,
-        Map<String, dynamic> sound}) async {
+        Map<String, dynamic> sound}) {
     this.context = context;
     this.iconApp = iconApp;
     this.onMessageCallback = onMessageCallback;
@@ -66,14 +65,21 @@ class MessagingConfig {
     if (Platform.isIOS && isAWSNotification) {
       setHandler();
     } else {
-      await Firebase.initializeApp();
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         print("onMessage: $message");
         inAppMessageHandlerRemoteMessage(message);
       });
+      // FirebaseMessaging.onBackgroundMessage((RemoteMessage message) {
+      //   print("onBackground: $message");
+      //   return myBackgroundMessageHandler(message.data);
+      // });
+      FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage message){
+        print("getInitialMessage: $message");
+        myBackgroundMessageHandler(message.data);
+      });
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         print("onResume: $message");
-        inAppMessageHandlerRemoteMessage(message);
+        myBackgroundMessageHandler(message.data);
       });
     }
   }
