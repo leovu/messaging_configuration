@@ -3,7 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="1834967c-5dd8-410c-99b0-d521de8027f2" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/example/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/messaging_config.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/messaging_config.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/messaging_configuration.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/messaging_configuration.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
@@ -22,19 +25,6 @@
         <option value="Dart File" />
       </list>
     </option>
-  </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>5.6.2</find>
-      <find>wao.flutter.application.project.messaging_configuration_example</find>
-      <find>vibr</find>
-      <find>if (await Vibration.hasVibrator()) {</find>
-      <find>notificationTap</find>
-      <find>flutter.io/vibrate</find>
-    </findStrings>
-    <replaceStrings>
-      <replace />
-    </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -76,5 +66,11 @@
       <updated>1602816697327</updated>
     </task>
     <servers />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="652" y="264" width="615" height="490" key="find.popup" timestamp="1622773738302">
+      <screen x="0" y="25" width="1920" height="968" />
+    </state>
+    <state x="652" y="264" width="615" height="490" key="find.popup/0.25.1920.968@0.25.1920.968" timestamp="1622773738302" />
   </component>
 </project>

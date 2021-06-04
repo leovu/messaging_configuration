@@ -1,6 +1,5 @@
 import 'dart:io';
-
-import 'package:audioplayers/audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +25,7 @@ class MessagingConfiguration {
         asset = sound;
       }
       else {
-        asset = await player.getAbsoluteUrl(sound);
+        asset = await getAbsoluteUrl(sound, player);
       }
     }
     MessagingConfig.singleton.init(context, onMessageCallback,
@@ -59,5 +58,14 @@ class MessagingConfiguration {
       }
     }
     return deviceToken;
+  }
+
+  static Future<String> getAbsoluteUrl(String fileName, AudioCache cache) async {
+    String prefix = 'assets/';
+    if (kIsWeb) {
+      return 'assets/$prefix$fileName';
+    }
+    Uri file = await cache.load(fileName);
+    return file.path;
   }
 }
