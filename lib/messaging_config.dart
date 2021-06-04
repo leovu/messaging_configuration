@@ -75,7 +75,7 @@ class MessagingConfig {
       // });
       FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage message){
         print("getInitialMessage: $message");
-        myBackgroundMessageHandler(message.data);
+        if(message != null) myBackgroundMessageHandler(message.data);
       });
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         print("onResume: $message");
