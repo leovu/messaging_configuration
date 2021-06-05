@@ -30,7 +30,7 @@ class MessagingConfig {
   MessagingConfig._internal();
 
   Function(Map<String, dynamic>) onMessageCallback;
-  dynamic onBackgroundMessageHandler;
+  Function(Map<String, dynamic>) onMessageBackgroundCallback;
   Function notificationInForeground;
   String iconApp;
   bool isVibrate;
@@ -40,17 +40,17 @@ class MessagingConfig {
   final _vibrate = const MethodChannel('flutter.io/vibrate');
   BuildContext context;
   init(BuildContext context, Function(Map<String, dynamic>) onMessageCallback,
+      Function(Map<String, dynamic>) onMessageBackgroundCallback,
       {bool isAWSNotification = true,
         String iconApp,
         Function notificationInForeground,
-        dynamic onBackgroundMessageHandler,
         bool isVibrate = false,
         Map<String, dynamic> sound}) {
     this.context = context;
     this.iconApp = iconApp;
     this.onMessageCallback = onMessageCallback;
+    this.onMessageBackgroundCallback = onMessageBackgroundCallback;
     this.notificationInForeground = notificationInForeground;
-    this.onBackgroundMessageHandler = onBackgroundMessageHandler;
     this.isVibrate = isVibrate;
     this.sound = sound;
     if (sound != null) {
@@ -180,8 +180,8 @@ class MessagingConfig {
 
   Future<dynamic> myBackgroundMessageHandler(
       Map<String, dynamic> message) async {
-    if (onMessageCallback != null) {
-      onMessageCallback(message);
+    if (onMessageBackgroundCallback != null) {
+      onMessageBackgroundCallback(message);
     }
   }
 }

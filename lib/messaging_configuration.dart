@@ -10,10 +10,10 @@ import 'package:messaging_configuration/messaging_config.dart';
 class MessagingConfiguration {
   static setUpMessagingConfiguration(BuildContext context,
       {Function(Map<String, dynamic>) onMessageCallback,
+        Function(Map<String, dynamic>) onMessageBackgroundCallback,
         bool isAWSNotification = true,
         String iconApp,
         Function notificationInForeground,
-        dynamic onBackgroundMessageHandler,
         bool isVibrate,
         String sound,
         int channelId}) async {
@@ -28,11 +28,10 @@ class MessagingConfiguration {
         asset = await getAbsoluteUrl(sound, player);
       }
     }
-    MessagingConfig.singleton.init(context, onMessageCallback,
+    MessagingConfig.singleton.init(context, onMessageCallback, onMessageBackgroundCallback,
         iconApp: iconApp,
         isAWSNotification: isAWSNotification,
         notificationInForeground: notificationInForeground,
-        onBackgroundMessageHandler:onBackgroundMessageHandler,
         isVibrate: isVibrate,
         sound: (asset != null && channelId != null)
             ? {"asset": asset, "channelId": channelId}
