@@ -91,16 +91,16 @@ class MessagingConfig {
   Future<dynamic> methodCallHandler(MethodCall methodCall) async {
     switch (methodCall.method) {
       case 'onMessage':
-        print(methodCall.arguments);
+        print("onMessage: ${methodCall.arguments}");
         Map<String, dynamic> message =
         Map<String, dynamic>.from(methodCall.arguments);
         this.inAppMessageHandler(message);
         return null;
       case 'onLaunch':
-        print(methodCall.arguments);
+        print("onLaunch: ${methodCall.arguments}");
         Map<String, dynamic> message =
         Map<String, dynamic>.from(methodCall.arguments);
-        this.myBackgroundMessageHandler(message);
+        this.myBackgroundMessageHandler(message["data"]);
         return null;
       default:
         throw PlatformException(code: 'notimpl', message: 'not implemented');
@@ -108,31 +108,12 @@ class MessagingConfig {
   }
 
   Future<dynamic> inAppMessageHandlerRemoteMessage(RemoteMessage message) async {
-    if (message.notification.title != null && message.notification.body != null) {
-      showAlertNotificationForeground(
-          message.notification.title, message.notification.body, message.data);
-      try {
-        if (isVibrate) {
-          _vibrate.invokeMethod('vibrate');
-        }
-        if (Platform.isIOS) {
-          if (sound != null) {
-            AudioCache player = AudioCache();
-            player.play(sound["asset"]);
-          }
-        }
-      } catch (e) {
-        print(e);
-      }
-    }
-    if (notificationInForeground != null) {
-      notificationInForeground();
-    }
+    showAlertNotificationForeground(
+        message.notification.title, message.notification.body, message.data);
   }
   Future<dynamic> inAppMessageHandler(Map<String, dynamic> message) async {
     String notiTitle;
     String notiDes;
-    print(message);
     if (message.containsKey("notification")) {
       notiTitle = message["notification"]["title"].toString();
       notiDes = message["notification"]["body"].toString();
@@ -140,8 +121,26 @@ class MessagingConfig {
       notiTitle = message["aps"]["alert"]["title"].toString();
       notiDes = message["aps"]["alert"]["body"].toString();
     }
+    showAlertNotificationForeground(notiTitle, notiDes, message["data"]);
+  }
+
+  void showAlertNotificationForeground(
+      String notiTitle, String notiDes, Map<String, dynamic> message) {
     if (notiTitle != null && notiDes != null) {
-      showAlertNotificationForeground(notiTitle, notiDes, message);
+      showOverlayNotification((context) {
+        return BannerNotification(
+          notiTitle: notiTitle,
+          notiDescription: notiDes,
+          iconApp: iconApp,
+          onReplay: () {
+            if (onMessageCallback != null) {
+              onMessageCallback(message);
+            }
+            OverlaySupportEntry.of(context).dismiss();
+          },
+        );
+      }, duration: Duration(seconds: 5));
+
       try {
         if (isVibrate) {
           _vibrate.invokeMethod('vibrate');
@@ -156,26 +155,10 @@ class MessagingConfig {
         print(e);
       }
     }
+
     if (notificationInForeground != null) {
       notificationInForeground();
     }
-  }
-
-  void showAlertNotificationForeground(
-      String notiTitle, String notiDes, Map<String, dynamic> message) {
-    showOverlayNotification((context) {
-      return BannerNotification(
-        notiTitle: notiTitle,
-        notiDescription: notiDes,
-        iconApp: iconApp,
-        onReplay: () {
-          if (onMessageCallback != null) {
-            onMessageCallback(message);
-          }
-          OverlaySupportEntry.of(context).dismiss();
-        },
-      );
-    }, duration: Duration(seconds: 5));
   }
 
   Future<dynamic> myBackgroundMessageHandler(
