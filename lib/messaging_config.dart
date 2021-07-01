@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -100,7 +101,7 @@ class MessagingConfig {
         print("onLaunch: ${methodCall.arguments}");
         Map<String, dynamic> message =
         Map<String, dynamic>.from(methodCall.arguments);
-        this.myBackgroundMessageHandler(message);
+        this.myBackgroundMessageHandler(Map<String, dynamic>.from(message["data"]));
         return null;
       default:
         throw PlatformException(code: 'notimpl', message: 'not implemented');
@@ -121,7 +122,7 @@ class MessagingConfig {
       notiTitle = message["aps"]["alert"]["title"].toString();
       notiDes = message["aps"]["alert"]["body"].toString();
     }
-    showAlertNotificationForeground(notiTitle, notiDes, message);
+    showAlertNotificationForeground(notiTitle, notiDes, Map<String, dynamic>.from(message["data"]));
   }
 
   void showAlertNotificationForeground(
