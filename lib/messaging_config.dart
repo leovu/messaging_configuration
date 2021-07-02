@@ -101,7 +101,7 @@ class MessagingConfig {
         print("onLaunch: ${methodCall.arguments}");
         Map<String, dynamic> message =
         Map<String, dynamic>.from(methodCall.arguments);
-        this.myBackgroundMessageHandler(json.decode(message["data"]));
+        this.myBackgroundMessageHandler(Map<String, dynamic>.from(message["data"]));
         return null;
       default:
         throw PlatformException(code: 'notimpl', message: 'not implemented');
@@ -122,7 +122,7 @@ class MessagingConfig {
       notiTitle = message["aps"]["alert"]["title"].toString();
       notiDes = message["aps"]["alert"]["body"].toString();
     }
-    showAlertNotificationForeground(notiTitle, notiDes, json.decode(message["data"]));
+    showAlertNotificationForeground(notiTitle, notiDes, Map<String, dynamic>.from(message["data"]));
   }
 
   void showAlertNotificationForeground(
