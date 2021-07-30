@@ -101,7 +101,15 @@ class MessagingConfig {
         print("onLaunch: ${methodCall.arguments}");
         Map<String, dynamic> message =
         Map<String, dynamic>.from(methodCall.arguments);
-        this.myBackgroundMessageHandler(json.decode(message["data"]));
+        try{
+          this.myBackgroundMessageHandler(json.decode(message["data"]));
+        }catch(e) {
+          print(e);
+          final validMap =
+          json.decode(json.encode(message["data"])) as Map<String, dynamic>;
+          this.myBackgroundMessageHandler(validMap);
+        }
+        // this.myBackgroundMessageHandler(json.decode(message["data"]));
         return null;
       default:
         throw PlatformException(code: 'notimpl', message: 'not implemented');
@@ -112,6 +120,7 @@ class MessagingConfig {
     showAlertNotificationForeground(
         message.notification.title, message.notification.body, message.data);
   }
+
   Future<dynamic> inAppMessageHandler(Map<String, dynamic> message) async {
     String notiTitle;
     String notiDes;
@@ -122,7 +131,14 @@ class MessagingConfig {
       notiTitle = message["aps"]["alert"]["title"].toString();
       notiDes = message["aps"]["alert"]["body"].toString();
     }
-    showAlertNotificationForeground(notiTitle, notiDes, json.decode(message["data"]));
+    try{
+      showAlertNotificationForeground(notiTitle, notiDes, json.decode(message["data"]));
+    }catch(e) {
+      print(e);
+      final validMap =
+      json.decode(json.encode(message["data"])) as Map<String, dynamic>;
+      showAlertNotificationForeground(notiTitle, notiDes, validMap);
+    }
   }
 
   void showAlertNotificationForeground(
