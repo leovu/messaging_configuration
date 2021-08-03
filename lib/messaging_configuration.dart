@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:messaging_configuration/messaging_config.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class MessagingConfiguration {
   static setUpMessagingConfiguration(BuildContext context,
@@ -51,6 +52,9 @@ class MessagingConfiguration {
           deviceToken = "";
         }
       } else {
+        if (Firebase.apps.length == 0) {
+          await Firebase.initializeApp();
+        }
         deviceToken = await FirebaseMessaging.instance.getToken();
       }
     }
