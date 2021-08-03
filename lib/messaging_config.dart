@@ -35,6 +35,7 @@ class MessagingConfig {
   Function notificationInForeground;
   String iconApp;
   bool isVibrate;
+  List<String> arrId = [];
   Map<String, dynamic> sound;
 
   final _awsMessaging = const MethodChannel('flutter.io/awsMessaging');
@@ -43,10 +44,10 @@ class MessagingConfig {
   init(BuildContext context, Function(Map<String, dynamic>) onMessageCallback,
       Function(Map<String, dynamic>) onMessageBackgroundCallback,
       {bool isAWSNotification = true,
-        String iconApp,
-        Function notificationInForeground,
-        bool isVibrate = false,
-        Map<String, dynamic> sound}) {
+      String iconApp,
+      Function notificationInForeground,
+      bool isVibrate = false,
+      Map<String, dynamic> sound}) {
     this.context = context;
     this.iconApp = iconApp;
     this.onMessageCallback = onMessageCallback;
@@ -57,7 +58,7 @@ class MessagingConfig {
     if (sound != null) {
       if (Platform.isAndroid) {
         const audioSoundSetup =
-        const MethodChannel('flutter.io/audioSoundSetup');
+            const MethodChannel('flutter.io/audioSoundSetup');
         audioSoundSetup
             .invokeMethod('setupSound', sound)
             .then((value) => print(value));
@@ -68,15 +69,20 @@ class MessagingConfig {
     } else {
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         print("onMessage: $message");
-        inAppMessageHandlerRemoteMessage(message);
+        if (!arrId.contains(message.messageId)) {
+          arrId.add(message.messageId);
+          inAppMessageHandlerRemoteMessage(message);
+        }
       });
       // FirebaseMessaging.onBackgroundMessage((RemoteMessage message) {
       //   print("onBackground: $message");
       //   return myBackgroundMessageHandler(message.data);
       // });
-      FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage message){
+      FirebaseMessaging.instance
+          .getInitialMessage()
+          .then((RemoteMessage message) {
         print("getInitialMessage: $message");
-        if(message != null) myBackgroundMessageHandler(message.data);
+        if (message != null) myBackgroundMessageHandler(message.data);
       });
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         print("onResume: $message");
@@ -94,29 +100,29 @@ class MessagingConfig {
       case 'onMessage':
         print("onMessage: ${methodCall.arguments}");
         Map<String, dynamic> message =
-        Map<String, dynamic>.from(methodCall.arguments);
+            Map<String, dynamic>.from(methodCall.arguments);
         this.inAppMessageHandler(message);
         return null;
       case 'onLaunch':
         print("onLaunch: ${methodCall.arguments}");
         Map<String, dynamic> message =
-        Map<String, dynamic>.from(methodCall.arguments);
-        try{
+            Map<String, dynamic>.from(methodCall.arguments);
+        try {
           this.myBackgroundMessageHandler(json.decode(message["data"]));
-        }catch(e) {
+        } catch (e) {
           print(e);
           final validMap =
-          json.decode(json.encode(message["data"])) as Map<String, dynamic>;
+              json.decode(json.encode(message["data"])) as Map<String, dynamic>;
           this.myBackgroundMessageHandler(validMap);
         }
-        // this.myBackgroundMessageHandler(json.decode(message["data"]));
         return null;
       default:
         throw PlatformException(code: 'notimpl', message: 'not implemented');
     }
   }
 
-  Future<dynamic> inAppMessageHandlerRemoteMessage(RemoteMessage message) async {
+  Future<dynamic> inAppMessageHandlerRemoteMessage(
+      RemoteMessage message) async {
     showAlertNotificationForeground(
         message.notification.title, message.notification.body, message.data);
   }
@@ -131,12 +137,13 @@ class MessagingConfig {
       notiTitle = message["aps"]["alert"]["title"].toString();
       notiDes = message["aps"]["alert"]["body"].toString();
     }
-    try{
-      showAlertNotificationForeground(notiTitle, notiDes, json.decode(message["data"]));
-    }catch(e) {
+    try {
+      showAlertNotificationForeground(
+          notiTitle, notiDes, json.decode(message["data"]));
+    } catch (e) {
       print(e);
       final validMap =
-      json.decode(json.encode(message["data"])) as Map<String, dynamic>;
+          json.decode(json.encode(message["data"])) as Map<String, dynamic>;
       showAlertNotificationForeground(notiTitle, notiDes, validMap);
     }
   }
@@ -253,7 +260,7 @@ class BannerNotificationState extends State<BannerNotification> {
                           child: widget.iconApp == null
                               ? Container()
                               : Image.asset(widget.iconApp,
-                              fit: BoxFit.contain),
+                                  fit: BoxFit.contain),
                         ),
                       ),
                     ),

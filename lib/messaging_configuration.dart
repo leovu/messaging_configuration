@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,25 +9,27 @@ import 'package:messaging_configuration/messaging_config.dart';
 class MessagingConfiguration {
   static setUpMessagingConfiguration(BuildContext context,
       {Function(Map<String, dynamic>) onMessageCallback,
-        Function(Map<String, dynamic>) onMessageBackgroundCallback,
-        bool isAWSNotification = true,
-        String iconApp,
-        Function notificationInForeground,
-        bool isVibrate,
-        String sound,
-        int channelId}) async {
-    if (kIsWeb) { return; }
+      Function(Map<String, dynamic>) onMessageBackgroundCallback,
+      bool isAWSNotification = true,
+      String iconApp,
+      Function notificationInForeground,
+      bool isVibrate,
+      String sound,
+      int channelId}) async {
+    if (kIsWeb) {
+      return;
+    }
     String asset;
     if (sound != null) {
       AudioCache player = AudioCache();
-      if(Platform.isIOS) {
+      if (Platform.isIOS) {
         asset = sound;
-      }
-      else {
+      } else {
         asset = await getAbsoluteUrl(sound, player);
       }
     }
-    MessagingConfig.singleton.init(context, onMessageCallback, onMessageBackgroundCallback,
+    MessagingConfig.singleton.init(
+        context, onMessageCallback, onMessageBackgroundCallback,
         iconApp: iconApp,
         isAWSNotification: isAWSNotification,
         notificationInForeground: notificationInForeground,
@@ -38,28 +39,26 @@ class MessagingConfiguration {
             : null);
   }
 
-  static const iOSPushToken =
-  const MethodChannel('flutter.io/awsMessaging');
+  static const iOSPushToken = const MethodChannel('flutter.io/awsMessaging');
   static Future<String> getPushToken({bool isAWS = false}) async {
     String deviceToken = "";
     if (!kIsWeb) {
       if (Platform.isIOS && isAWS) {
         try {
-          deviceToken =
-          await iOSPushToken.invokeMethod('getToken');
+          deviceToken = await iOSPushToken.invokeMethod('getToken');
         } on PlatformException {
           print("Error receivePushNotificationToken");
           deviceToken = "";
         }
       } else {
-        await Firebase.initializeApp();
         deviceToken = await FirebaseMessaging.instance.getToken();
       }
     }
     return deviceToken;
   }
 
-  static Future<String> getAbsoluteUrl(String fileName, AudioCache cache) async {
+  static Future<String> getAbsoluteUrl(
+      String fileName, AudioCache cache) async {
     String prefix = 'assets/';
     if (kIsWeb) {
       return 'assets/$prefix$fileName';
