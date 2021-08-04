@@ -5,7 +5,7 @@ import 'package:messaging_configuration/messaging_configuration.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 void main() async {
-  await MessagingConfiguration.init();
+  await MessagingConfiguration.init(isAWS: true);
   runApp(MyApp());
 }
 

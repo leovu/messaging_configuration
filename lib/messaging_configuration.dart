@@ -8,9 +8,12 @@ import 'package:messaging_configuration/messaging_config.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class MessagingConfiguration {
-  static init() async {
+  static init({bool isAWS = false}) async {
     WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
+    if (Platform.isIOS && isAWS) {
+    } else {
+      await Firebase.initializeApp();
+    }
   }
 
   static setUpMessagingConfiguration(BuildContext context,
