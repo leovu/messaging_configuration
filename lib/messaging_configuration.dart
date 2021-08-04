@@ -8,6 +8,11 @@ import 'package:messaging_configuration/messaging_config.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class MessagingConfiguration {
+  static init() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
+  }
+
   static setUpMessagingConfiguration(BuildContext context,
       {Function(Map<String, dynamic>) onMessageCallback,
       Function(Map<String, dynamic>) onMessageBackgroundCallback,
@@ -52,9 +57,6 @@ class MessagingConfiguration {
           deviceToken = "";
         }
       } else {
-        if (Firebase.apps.length == 0) {
-          await Firebase.initializeApp();
-        }
         deviceToken = await FirebaseMessaging.instance.getToken();
       }
     }

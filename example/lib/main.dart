@@ -4,7 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:messaging_configuration/messaging_configuration.dart';
 import 'package:overlay_support/overlay_support.dart';
 
-void main() {
+void main() async {
+  MessagingConfiguration.init();
   runApp(MyApp());
 }
 
