@@ -155,6 +155,8 @@ class MessagingConfig {
       String notiTitle, String notiDes, Map<String, dynamic> message) {
     if (isCustomForegroundNotification) {
       if (onMessageCallback != null) {
+        message["title"] = notiTitle;
+        message["body"] = notiDes;
         onMessageCallback(message);
       }
     } else {
