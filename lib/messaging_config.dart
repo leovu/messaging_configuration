@@ -32,6 +32,7 @@ class MessagingConfig {
 
   Function(Map<String, dynamic>) onMessageCallback;
   Function(Map<String, dynamic>) onMessageBackgroundCallback;
+  bool isCustomForegroundNotification = false;
   Function notificationInForeground;
   String iconApp;
   bool isVibrate;
@@ -44,6 +45,7 @@ class MessagingConfig {
   init(BuildContext context, Function(Map<String, dynamic>) onMessageCallback,
       Function(Map<String, dynamic>) onMessageBackgroundCallback,
       {bool isAWSNotification = true,
+      bool isCustomForegroundNotification = false,
       String iconApp,
       Function notificationInForeground,
       bool isVibrate = false,
@@ -54,6 +56,7 @@ class MessagingConfig {
     this.onMessageBackgroundCallback = onMessageBackgroundCallback;
     this.notificationInForeground = notificationInForeground;
     this.isVibrate = isVibrate;
+    this.isCustomForegroundNotification = isCustomForegroundNotification;
     this.sound = sound;
     if (sound != null) {
       if (Platform.isAndroid) {
@@ -150,6 +153,25 @@ class MessagingConfig {
 
   void showAlertNotificationForeground(
       String notiTitle, String notiDes, Map<String, dynamic> message) {
+    if (isCustomForegroundNotification) {
+      if (onMessageCallback != null) {
+        onMessageCallback(message);
+      }
+    } else {
+      showNotificationDefault(notiTitle, notiDes, message);
+    }
+  }
+
+  Future<dynamic> myBackgroundMessageHandler(
+      Map<String, dynamic> message) async {
+    if (onMessageBackgroundCallback != null) {
+      onMessageBackgroundCallback(message);
+    }
+  }
+
+  void showNotificationDefault(
+      String notiTitle, String notiDes, Map<String, dynamic> message,
+      {Function omCB}) {
     if (notiTitle != null && notiDes != null) {
       showOverlayNotification((context) {
         return BannerNotification(
@@ -157,9 +179,7 @@ class MessagingConfig {
           notiDescription: notiDes,
           iconApp: iconApp,
           onReplay: () {
-            if (onMessageCallback != null) {
-              onMessageCallback(message);
-            }
+            omCB();
             OverlaySupportEntry.of(context).dismiss();
           },
         );
@@ -182,13 +202,6 @@ class MessagingConfig {
 
     if (notificationInForeground != null) {
       notificationInForeground();
-    }
-  }
-
-  Future<dynamic> myBackgroundMessageHandler(
-      Map<String, dynamic> message) async {
-    if (onMessageBackgroundCallback != null) {
-      onMessageBackgroundCallback(message);
     }
   }
 }
