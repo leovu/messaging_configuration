@@ -73,6 +73,32 @@ class MessagingConfiguration {
     }
     return deviceToken;
   }
+  static Future<bool> requestPermission() async {
+    bool status = false;
+    NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('User granted permission');
+      status = true;
+    } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+      print('User granted provisional permission');
+      status = true;
+    } else {
+      print('User declined or has not accepted permission');
+      status = false;
+    }
+    return status;
+  }
+
+
+
 
   static Future<String> getAbsoluteUrl(
       String fileName, AudioCache cache) async {
