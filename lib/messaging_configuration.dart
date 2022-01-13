@@ -3,14 +3,14 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
 import 'package:messaging_configuration/messaging_config.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class MessagingConfiguration {
   static init({bool isAWS = false}) async {
     WidgetsFlutterBinding.ensureInitialized();
-    if (Platform.isIOS && isAWS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS && isAWS) {
     } else {
       await Firebase.initializeApp();
     }
@@ -26,13 +26,10 @@ class MessagingConfiguration {
       bool isVibrate,
       String sound,
       int channelId}) async {
-    if (kIsWeb) {
-      return;
-    }
     String asset;
     if (sound != null) {
       AudioCache player = AudioCache();
-      if (Platform.isIOS) {
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
         asset = sound;
       } else {
         asset = await getAbsoluteUrl(sound, player);
@@ -58,10 +55,10 @@ class MessagingConfiguration {
   }
 
   static const iOSPushToken = const MethodChannel('flutter.io/awsMessaging');
-  static Future<String> getPushToken({bool isAWS = false}) async {
+  static Future<String> getPushToken({bool isAWS = false,  String vapidKey}) async {
     String deviceToken = "";
     if (!kIsWeb) {
-      if (Platform.isIOS && isAWS) {
+      if (defaultTargetPlatform == TargetPlatform.iOS && isAWS) {
         try {
           deviceToken = await iOSPushToken.invokeMethod('getToken');
         } on PlatformException {
@@ -71,6 +68,8 @@ class MessagingConfiguration {
       } else {
         deviceToken = await FirebaseMessaging.instance.getToken();
       }
+    }else {
+      deviceToken = await FirebaseMessaging.instance.getToken(vapidKey: vapidKey);
     }
     return deviceToken;
   }

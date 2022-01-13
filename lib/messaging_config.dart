@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -59,7 +60,7 @@ class MessagingConfig {
     this.isCustomForegroundNotification = isCustomForegroundNotification;
     this.sound = sound;
     if (sound != null) {
-      if (Platform.isAndroid) {
+      if (defaultTargetPlatform == TargetPlatform.android) {
         const audioSoundSetup =
             const MethodChannel('flutter.io/audioSoundSetup');
         audioSoundSetup
@@ -67,7 +68,7 @@ class MessagingConfig {
             .then((value) => print(value));
       }
     }
-    if (Platform.isIOS && isAWSNotification) {
+    if (defaultTargetPlatform == TargetPlatform.iOS && isAWSNotification) {
       setHandler();
     } else {
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -191,7 +192,7 @@ class MessagingConfig {
         if (isVibrate) {
           _vibrate.invokeMethod('vibrate');
         }
-        if (Platform.isIOS) {
+        if (defaultTargetPlatform == TargetPlatform.iOS) {
           if (sound != null) {
             AudioCache player = AudioCache();
             player.play(sound["asset"]);
