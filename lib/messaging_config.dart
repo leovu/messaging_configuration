@@ -236,91 +236,98 @@ class BannerNotificationState extends State<BannerNotification> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.all(Radius.circular(12.0)),
-            boxShadow: [
-              BoxShadow(
-                color: HexColor("DEE7F1"),
-                blurRadius: 3.0,
-                spreadRadius: 0.5,
-              ),
-            ],
-          ),
-          child: Card(
-            margin: EdgeInsets.zero,
-            color: Colors.white,
-            child: ListTile(
-              onTap: () {
-                if (widget.onReplay != null) widget.onReplay();
-              },
-              title: Padding(
-                padding: const EdgeInsets.only(top: 5.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minWidth: 40,
-                        minHeight: 40,
-                        maxWidth: 40,
-                        maxHeight: 40,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: Container(
-                          child: widget.iconApp == null
-                              ? Container()
-                              : Image.asset(widget.iconApp,
-                                  fit: BoxFit.contain),
+      child: Dismissible(
+        key: UniqueKey(),
+        direction: DismissDirection.up,
+        onDismissed: (direction) {
+          OverlaySupportEntry.of(context).dismiss(animate: false);
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.all(Radius.circular(12.0)),
+              boxShadow: [
+                BoxShadow(
+                  color: HexColor("DEE7F1"),
+                  blurRadius: 3.0,
+                  spreadRadius: 0.5,
+                ),
+              ],
+            ),
+            child: Card(
+              margin: EdgeInsets.zero,
+              color: Colors.white,
+              child: ListTile(
+                onTap: () {
+                  if (widget.onReplay != null) widget.onReplay();
+                },
+                title: Padding(
+                  padding: const EdgeInsets.only(top: 5.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minWidth: 40,
+                          minHeight: 40,
+                          maxWidth: 40,
+                          maxHeight: 40,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: Container(
+                            child: widget.iconApp == null
+                                ? Container()
+                                : Image.asset(widget.iconApp,
+                                    fit: BoxFit.contain),
+                          ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 5.0),
-                            child: Text(
-                              widget.notiTitle,
-                              maxLines: 1,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.left,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                left: 5.0, top: 5.0, bottom: 5.0),
-                            child: Text(widget.notiDescription,
-                                maxLines: 2,
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 5.0),
+                              child: Text(
+                                widget.notiTitle,
+                                maxLines: 1,
                                 style: TextStyle(
-                                    color: Colors.black, fontSize: 12),
-                                textAlign: TextAlign.left),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.left,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 5.0, top: 5.0, bottom: 5.0),
+                              child: Text(widget.notiDescription,
+                                  maxLines: 2,
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 12),
+                                  textAlign: TextAlign.left),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-              subtitle: Container(
-                padding: EdgeInsets.only(top: 15, bottom: 5),
-                alignment: Alignment.center,
-                child: Container(
-                  height: 5,
-                  width: 50,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(2.5)),
-                      color: HexColor("E2E4EC")),
+                subtitle: Container(
+                  padding: EdgeInsets.only(top: 15, bottom: 5),
+                  alignment: Alignment.center,
+                  child: Container(
+                    height: 5,
+                    width: 50,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(2.5)),
+                        color: HexColor("E2E4EC")),
+                  ),
                 ),
               ),
             ),
