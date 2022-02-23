@@ -78,10 +78,10 @@ class MessagingConfig {
           inAppMessageHandlerRemoteMessage(message);
         // }
       });
-      // FirebaseMessaging.onBackgroundMessage((RemoteMessage message) {
-      //   print("onBackground: $message");
-      //   return myBackgroundMessageHandler(message.data);
-      // });
+      FirebaseMessaging.onBackgroundMessage((RemoteMessage message) {
+        print("onBackground: $message");
+        return myBackgroundMessageHandler(message.data);
+      });
       FirebaseMessaging.instance
           .getInitialMessage()
           .then((RemoteMessage message) {
