@@ -37,7 +37,7 @@ class MessagingConfig {
   Function notificationInForeground;
   String iconApp;
   bool isVibrate;
-  List<String> arrId = [];
+  // List<String> arrId = [];
   Map<String, dynamic> sound;
 
   final _awsMessaging = const MethodChannel('flutter.io/awsMessaging');
@@ -73,10 +73,10 @@ class MessagingConfig {
     } else {
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         print("onMessage: $message");
-        if (!arrId.contains(message.messageId)) {
-          arrId.add(message.messageId);
+        // if (!arrId.contains(message.messageId)) {
+        //   arrId.add(message.messageId);
           inAppMessageHandlerRemoteMessage(message);
-        }
+        // }
       });
       // FirebaseMessaging.onBackgroundMessage((RemoteMessage message) {
       //   print("onBackground: $message");
