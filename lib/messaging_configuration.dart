@@ -67,9 +67,17 @@ class MessagingConfiguration {
         }
       } else {
         deviceToken = await FirebaseMessaging.instance.getToken();
+        if (deviceToken == null || deviceToken == "") {
+          await FirebaseMessaging.instance.onTokenRefresh.last;
+          deviceToken = await FirebaseMessaging.instance.getToken();
+        }
       }
     }else {
       deviceToken = await FirebaseMessaging.instance.getToken(vapidKey: vapidKey);
+      if (deviceToken == null || deviceToken == "") {
+        await FirebaseMessaging.instance.onTokenRefresh.last;
+        deviceToken = await FirebaseMessaging.instance.getToken();
+      }
     }
     return deviceToken;
   }

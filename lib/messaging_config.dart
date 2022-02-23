@@ -187,22 +187,22 @@ class MessagingConfig {
           },
         );
       }, duration: Duration(seconds: 5));
-
-      try {
-        if (isVibrate) {
-          _vibrate.invokeMethod('vibrate');
-        }
-        if (defaultTargetPlatform == TargetPlatform.iOS) {
-          if (sound != null) {
-            AudioCache player = AudioCache();
-            player.play(sound["asset"]);
+      if(!kIsWeb) {
+        try {
+          if (isVibrate) {
+            _vibrate.invokeMethod('vibrate');
           }
+          if (defaultTargetPlatform == TargetPlatform.iOS) {
+            if (sound != null) {
+              AudioCache player = AudioCache();
+              player.play(sound["asset"]);
+            }
+          }
+        } catch (e) {
+          print(e);
         }
-      } catch (e) {
-        print(e);
       }
     }
-
     if (notificationInForeground != null) {
       notificationInForeground();
     }
