@@ -4,7 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:messaging_configuration/messaging_configuration.dart';
 import 'package:overlay_support/overlay_support.dart';
 
-void main() {
+void main() async {
+  await MessagingConfiguration.init(isAWS: true);
   runApp(MyApp());
 }
 
@@ -21,7 +22,6 @@ class _MyAppState extends State<MyApp> {
       MessagingConfiguration.setUpMessagingConfiguration(context,
           onMessageCallback: onMessageCallback,
           notificationInForeground: _notificationInForeground,
-          onBackgroundMessageHandler: _myBackgroundMessageHandler,
           isAWSNotification: false,
           iconApp: "assets/logo/icon-app.png",
           isVibrate: true,
@@ -35,23 +35,10 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  Future<dynamic> _myBackgroundMessageHandler(Map<String, dynamic> message) async {
-    if (message.containsKey('data')) {
-      // Handle data message
-      final dynamic data = message['data'];
-    }
-
-    if (message.containsKey('notification')) {
-      // Handle notification message
-      final dynamic notification = message['notification'];
-    }
-
-    // Or do other work.
-  }
-
   onMessageCallback(Map<String, dynamic> message) {
     print(message);
   }
+
   _notificationInForeground() {
     print("_notificationInForeground");
   }
