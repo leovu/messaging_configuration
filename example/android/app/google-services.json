@@ -1,37 +1,26 @@
 {
   "project_info": {
-    "project_number": "936208669690",
-    "firebase_url": "https://metal-circle-250116.firebaseio.com",
-    "project_id": "metal-circle-250116",
-    "storage_bucket": "metal-circle-250116.appspot.com"
+    "project_number": "996764566049",
+    "project_id": "epoints-staff-sale",
+    "storage_bucket": "epoints-staff-sale.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:936208669690:android:db6e128f38e89b1ca1e243",
+        "mobilesdk_app_id": "1:996764566049:android:4d9bc8b2b652201fadd960",
         "android_client_info": {
-          "package_name": "bio.wao.mathew.epoint.vn"
+          "package_name": "bio.wao.sale.staff.vn"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "936208669690-kuhissjsb8j5qt38sca0a2lp1ijmd836.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDclVy8KfsswtRfaR-QPNe7yY1qdKLs4yQ"
+          "current_key": "AIzaSyAmn2JNRwabKRYmrVbTPImY6XV5rjTOXzY"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "936208669690-kuhissjsb8j5qt38sca0a2lp1ijmd836.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
