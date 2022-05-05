@@ -24,6 +24,7 @@ class HexColor extends Color {
 class MessagingConfig {
   static final MessagingConfig _singleton = new MessagingConfig._internal();
   static MessagingConfig get singleton => _singleton;
+  static int semaphore = 0;
 
   factory MessagingConfig() {
     return _singleton;
@@ -72,10 +73,15 @@ class MessagingConfig {
       setHandler();
     } else {
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        if (semaphore != 0) {
+          return;
+        }
+        semaphore = 1;
+        Future.delayed(Duration(seconds: 1)).then((_) => semaphore = 0);
         print("onMessage: $message");
         // if (!arrId.contains(message.messageId)) {
         //   arrId.add(message.messageId);
-          inAppMessageHandlerRemoteMessage(message);
+        inAppMessageHandlerRemoteMessage(message);
         // }
       });
       // FirebaseMessaging.onBackgroundMessage((RemoteMessage message) {
