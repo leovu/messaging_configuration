@@ -5,9 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.os.Build
 import android.os.Handler
-import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 
 
 class FirebaseBroadcastReceiver : BroadcastReceiver() {
@@ -52,9 +51,12 @@ class AudioPlayer {
             mMediaPlayer =  MediaPlayer()
             mMediaPlayer.setDataSource(fileName)
             mMediaPlayer.isLooping = false
-            mMediaPlayer.setVolume(100f, 100f)
-            mMediaPlayer.prepare()
-            mMediaPlayer.start()
+            val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+            if (am?.ringerMode == AudioManager.RINGER_MODE_NORMAL) {
+                mMediaPlayer.setVolume(100f, 100f)
+                mMediaPlayer.prepare()
+                mMediaPlayer.start()
+            }
         }catch (ex: Exception){
             ex.printStackTrace()
         }
