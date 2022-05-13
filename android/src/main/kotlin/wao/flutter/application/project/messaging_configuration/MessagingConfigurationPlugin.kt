@@ -41,7 +41,7 @@ class MessagingConfigurationPlugin: FlutterPlugin, MethodCallHandler {
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     if (call.method == "setupSound") {
-      val dict:Map<String,Any> = call.arguments()
+      val dict:Map<String,Any> = call.arguments()!!
       if(dict["asset"] == null || dict["asset"] == "") {
         result.success("Android Setup Sound failed")
       }
