@@ -42,11 +42,11 @@ class MessagingConfigurationPlugin: FlutterPlugin, MethodCallHandler {
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
     if (call.method == "setupSound") {
       val dict:Map<String,Any>? = call.arguments()
-      if(dict["asset"] == null || dict["asset"] == "") {
+      if(dict?["asset"] == null || dict?["asset"] == "") {
         result.success("Android Setup Sound failed")
       }
       else {
-        createChannel(dict["asset"].toString(),dict["channelId"].toString())
+        createChannel(dict?["asset"].toString(),dict?["channelId"].toString())
         result.success("Android Setup Sound completed")
       }
     }
