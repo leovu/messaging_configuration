@@ -7,10 +7,12 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Handler
 import androidx.core.content.ContextCompat.getSystemService
-
+import android.os.PowerManager
 
 class FirebaseBroadcastReceiver : BroadcastReceiver() {
+    private var wakeLock: PowerManager.WakeLock? = null
     override fun onReceive(context: Context, intent: Intent) {
+        acquireWakeLock(context)
         val sharePref: SharePref = SharePref.getInstance(context)
         val value:String = sharePref.getData(UtilProject.key)
         if(value != "") {
@@ -23,14 +25,34 @@ class FirebaseBroadcastReceiver : BroadcastReceiver() {
                                 audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
                                 AudioManager.MODE_NORMAL)
                     }
+                    releaseWakeLock()
                 }, 250)
             }catch (ex: Exception){
+                releaseWakeLock()
                 ex.printStackTrace()
             }
+        }
+        else {
+            releaseWakeLock()
         }
     }
     private fun delayFunction(function: ()-> Unit, delay: Long) {
         Handler().postDelayed(function, delay)
+    }
+    fun acquireWakeLock(context: Context) {
+        if (wakeLock != null) wakeLock!!.release()
+        val pm: PowerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        wakeLock = pm.newWakeLock(
+            PowerManager.FULL_WAKE_LOCK or
+                    PowerManager.ACQUIRE_CAUSES_WAKEUP or
+                    PowerManager.ON_AFTER_RELEASE, "WakeLock"
+        )
+        wakeLock!!.acquire()
+    }
+
+    fun releaseWakeLock() {
+        if (wakeLock != null) wakeLock!!.release()
+        wakeLock = null
     }
 }
 
