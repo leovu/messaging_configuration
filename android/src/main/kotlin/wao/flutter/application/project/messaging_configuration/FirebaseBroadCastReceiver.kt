@@ -6,8 +6,9 @@ import android.content.Intent
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Handler
-import androidx.core.content.ContextCompat.getSystemService
 import android.os.PowerManager
+import androidx.core.content.ContextCompat.getSystemService
+
 
 class FirebaseBroadcastReceiver : BroadcastReceiver() {
     private var wakeLock: PowerManager.WakeLock? = null
@@ -17,14 +18,12 @@ class FirebaseBroadcastReceiver : BroadcastReceiver() {
         val value:String = sharePref.getData(UtilProject.key)
         if(value != "") {
             try {
-                AudioPlayer().playAudio(context, value)
                 delayFunction({
                     val audioManager: AudioManager? = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
-                    if(audioManager!!.getStreamVolume(AudioManager.STREAM_MUSIC) < audioManager!!.getStreamMaxVolume(AudioManager.STREAM_MUSIC)/2) {
-                        audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC,
-                                audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
-                                AudioManager.MODE_NORMAL)
-                    }
+                    audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC,
+                        audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+                        AudioManager.MODE_NORMAL)
+                    AudioPlayer().playAudio(context, value)
                     releaseWakeLock()
                 }, 250)
             }catch (ex: Exception){
@@ -45,7 +44,7 @@ class FirebaseBroadcastReceiver : BroadcastReceiver() {
         wakeLock = pm.newWakeLock(
             PowerManager.FULL_WAKE_LOCK or
                     PowerManager.ACQUIRE_CAUSES_WAKEUP or
-                    PowerManager.ON_AFTER_RELEASE, "WakeLock"
+                    PowerManager.ON_AFTER_RELEASE, "AppTag:WakeLock"
         )
         wakeLock!!.acquire()
     }
@@ -74,8 +73,9 @@ class AudioPlayer {
             mMediaPlayer.setDataSource(fileName)
             mMediaPlayer.isLooping = false
             val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+            val currentVolume = am!!.getStreamVolume(AudioManager.STREAM_NOTIFICATION)
             if (am?.ringerMode == AudioManager.RINGER_MODE_NORMAL) {
-                mMediaPlayer.setVolume(100f, 100f)
+                mMediaPlayer.setVolume(currentVolume.toFloat(), currentVolume.toFloat())
                 mMediaPlayer.prepare()
                 mMediaPlayer.start()
             }
