@@ -1,13 +1,11 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'dart:ui';
+import 'package:flutter_mute/flutter_mute.dart';
 
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
@@ -184,7 +182,7 @@ class MessagingConfig {
 
   void showNotificationDefault(
       String notiTitle, String notiDes, Map<String, dynamic> message,
-      {Function omCB}) {
+      {Function omCB}) async {
     if (notiTitle != null && notiDes != null) {
       showOverlayNotification((context) {
         return BannerNotification(
@@ -204,8 +202,11 @@ class MessagingConfig {
           }
           if (defaultTargetPlatform == TargetPlatform.iOS) {
             if (sound != null) {
-              AudioCache player = AudioCache();
-              player.play(sound["asset"]);
+              RingerMode ringerMode = await FlutterMute.getRingerMode();
+              if(ringerMode == RingerMode.Normal) {
+                AudioCache player = AudioCache();
+                player.play(sound["asset"]);
+              }
             }
           }
         } catch (e) {
