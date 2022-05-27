@@ -20,8 +20,9 @@ class FirebaseBroadcastReceiver : BroadcastReceiver() {
             try {
                 delayFunction({
                     val audioManager: AudioManager? = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+                    val currentVolume = audioManager!!.getStreamVolume(AudioManager.STREAM_NOTIFICATION)
                     audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC,
-                        audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+                        currentVolume,
                         AudioManager.MODE_NORMAL)
                     AudioPlayer().playAudio(context, value)
                     releaseWakeLock()
