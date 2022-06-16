@@ -75,10 +75,12 @@ class AudioPlayer {
             mMediaPlayer.isLooping = false
             val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
             val currentVolume = am!!.getStreamVolume(AudioManager.STREAM_NOTIFICATION)
-            if (am?.ringerMode == AudioManager.RINGER_MODE_NORMAL) {
-                mMediaPlayer.setVolume(currentVolume.toFloat(), currentVolume.toFloat())
-                mMediaPlayer.prepare()
-                mMediaPlayer.start()
+            if(currentVolume > 0) {
+                if (am?.ringerMode == AudioManager.RINGER_MODE_NORMAL) {
+                    mMediaPlayer.setVolume(currentVolume.toFloat(), currentVolume.toFloat())
+                    mMediaPlayer.prepare()
+                    mMediaPlayer.start()
+                }
             }
         }catch (ex: Exception){
             ex.printStackTrace()
