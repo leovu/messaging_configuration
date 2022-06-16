@@ -77,11 +77,11 @@ class AudioPlayer {
             val currentVolume = am!!.getStreamVolume(AudioManager.STREAM_NOTIFICATION)
             val toast: Toast = Toast.makeText(
                 context,
-                currentVolume.toFloat().toString() + " Volume ne",
+                "$currentVolume Volume ne",
                 Toast.LENGTH_SHORT
             )
             toast.show()
-            if(currentVolume.toFloat() > 0.0) {
+            if(currentVolume >= 1) {
                 if (am?.ringerMode == AudioManager.RINGER_MODE_NORMAL) {
                     mMediaPlayer.setVolume(currentVolume.toFloat(), currentVolume.toFloat())
                     mMediaPlayer.prepare()
