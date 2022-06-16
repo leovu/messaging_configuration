@@ -21,10 +21,12 @@ class FirebaseBroadcastReceiver : BroadcastReceiver() {
                 delayFunction({
                     val audioManager: AudioManager? = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
                     val currentVolume = audioManager!!.getStreamVolume(AudioManager.STREAM_NOTIFICATION)
-                    audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC,
-                        currentVolume,
-                        AudioManager.MODE_NORMAL)
-                    AudioPlayer().playAudio(context, value)
+                    if(currentVolume > 0) {
+                        audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC,
+                            currentVolume,
+                            AudioManager.MODE_NORMAL)
+                        AudioPlayer().playAudio(context, value)
+                    }
                     releaseWakeLock()
                 }, 250)
             }catch (ex: Exception){
@@ -75,13 +77,7 @@ class AudioPlayer {
             mMediaPlayer.isLooping = false
             val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
             val currentVolume = am!!.getStreamVolume(AudioManager.STREAM_NOTIFICATION)
-            val toast: Toast = Toast.makeText(
-                context,
-                "$currentVolume Volume ne",
-                Toast.LENGTH_SHORT
-            )
-            toast.show()
-            if(currentVolume >= 1) {
+            if(currentVolume > 0) {
                 if (am?.ringerMode == AudioManager.RINGER_MODE_NORMAL) {
                     mMediaPlayer.setVolume(currentVolume.toFloat(), currentVolume.toFloat())
                     mMediaPlayer.prepare()
