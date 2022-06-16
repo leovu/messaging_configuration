@@ -7,7 +7,7 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.PowerManager
-import androidx.core.content.ContextCompat.getSystemService
+import android.widget.Toast
 
 
 class FirebaseBroadcastReceiver : BroadcastReceiver() {
@@ -75,7 +75,13 @@ class AudioPlayer {
             mMediaPlayer.isLooping = false
             val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
             val currentVolume = am!!.getStreamVolume(AudioManager.STREAM_NOTIFICATION)
-            if(currentVolume > 0) {
+            val toast: Toast = Toast.makeText(
+                context,
+                currentVolume.toFloat().toString() + " Volume ne",
+                Toast.LENGTH_SHORT
+            )
+            toast.show()
+            if(currentVolume.toFloat() > 0.0) {
                 if (am?.ringerMode == AudioManager.RINGER_MODE_NORMAL) {
                     mMediaPlayer.setVolume(currentVolume.toFloat(), currentVolume.toFloat())
                     mMediaPlayer.prepare()
