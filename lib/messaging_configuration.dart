@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -8,11 +7,15 @@ import 'package:messaging_configuration/messaging_config.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class MessagingConfiguration {
-  static init({bool isAWS = false}) async {
+  static init({bool isAWS = false, FirebaseOptions options}) async {
     WidgetsFlutterBinding.ensureInitialized();
     if (defaultTargetPlatform == TargetPlatform.iOS && isAWS) {
     } else {
-      await Firebase.initializeApp();
+      if(kIsWeb){
+        await Firebase.initializeApp(options: options);
+      }else{
+        await Firebase.initializeApp();
+      }
     }
   }
 
