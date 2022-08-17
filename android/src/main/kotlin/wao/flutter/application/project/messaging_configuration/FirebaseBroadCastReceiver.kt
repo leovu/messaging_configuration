@@ -19,14 +19,7 @@ class FirebaseBroadcastReceiver : BroadcastReceiver() {
         if(value != "") {
             try {
                 delayFunction({
-                    val audioManager: AudioManager? = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
-                    val currentVolume = audioManager!!.getStreamVolume(AudioManager.STREAM_NOTIFICATION)
-                    if(currentVolume > 0) {
-                        audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC,
-                            currentVolume,
-                            AudioManager.MODE_NORMAL)
-                        AudioPlayer().playAudio(context, value)
-                    }
+                    AudioPlayer().playAudio(context, value)
                     releaseWakeLock()
                 }, 250)
             }catch (ex: Exception){
@@ -76,12 +69,19 @@ class AudioPlayer {
             mMediaPlayer.setDataSource(fileName)
             mMediaPlayer.isLooping = false
             val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
-            val currentVolume = am!!.getStreamVolume(AudioManager.STREAM_NOTIFICATION)
-            if(currentVolume > 0) {
+            val currentVolumeNotification = am!!.getStreamVolume(AudioManager.STREAM_NOTIFICATION)
+            if(currentVolumeNotification > 0) {
                 if (am?.ringerMode == AudioManager.RINGER_MODE_NORMAL) {
-                    mMediaPlayer.setVolume(currentVolume.toFloat(), currentVolume.toFloat())
+                    val currentVolume = am!!.getStreamVolume(AudioManager.STREAM_MUSIC)
+                    if(currentVolume > 65) {
+                        mMediaPlayer.setVolume(50.toFloat(), currentVolume.toFloat())
+                    }
+                    else {
+                        mMediaPlayer.setVolume(25.toFloat(), currentVolume.toFloat())
+                    }
                     mMediaPlayer.prepare()
                     mMediaPlayer.start()
+                    mMediaPlayer.setVolume(currentVolume.toFloat(), currentVolume.toFloat())
                 }
             }
         }catch (ex: Exception){
