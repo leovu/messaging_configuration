@@ -204,8 +204,8 @@ class MessagingConfig {
             if (sound != null) {
               RingerMode ringerMode = await FlutterMute.getRingerMode();
               if(ringerMode == RingerMode.Normal) {
-                AudioCache player = AudioCache();
-                player.play(sound["asset"]);
+                final player = AudioPlayer();
+                player.play(AssetSource(sound["asset"]));
               }
             }
           }
