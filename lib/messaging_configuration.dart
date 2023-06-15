@@ -53,7 +53,7 @@ class MessagingConfiguration {
   }
 
   static void showNotificationDefault(String notiTitle, String notiDes,
-      Map<String, dynamic> message, Function onMessageCallback) {
+      Map<String, dynamic> message, Function? onMessageCallback) {
     MessagingConfig.singleton.showNotificationDefault(
         notiTitle, notiDes, message,
         omCB: onMessageCallback);
