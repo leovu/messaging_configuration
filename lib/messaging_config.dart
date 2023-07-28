@@ -134,12 +134,12 @@ class MessagingConfig {
     String? title ="";
     String? body ="";
 
-    if(message?.notification?.title!=null){
+    if(message.notification?.title!=null){
       title = message.notification!.title;
     }else if(message.data["title"]!=null){
       title = message.data["title"];
     }
-    if(message?.notification?.body!=null){
+    if(message.notification?.body!=null){
       body = message.notification!.body;
     }else if(message.data["body"]!=null){
       body = message.data["body"];

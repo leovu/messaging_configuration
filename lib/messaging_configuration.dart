@@ -79,7 +79,7 @@ class MessagingConfiguration {
       }
     }else {
       deviceToken = (await FirebaseMessaging.instance.getToken(vapidKey: vapidKey))!;
-      if (deviceToken == null || deviceToken == "") {
+      if (deviceToken == "") {
         await FirebaseMessaging.instance.onTokenRefresh.last;
         deviceToken = (await FirebaseMessaging.instance.getToken())!;
       }

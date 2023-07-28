@@ -28,14 +28,14 @@ class _MyAppState extends State<MyApp> {
           sound: "audio/alert_tone.mp3",
           channelId: 105);
       MessagingConfiguration.getPushToken().then((value) {
-        Clipboard.setData(new ClipboardData(text: value)).then((_) {
+        Clipboard.setData(new ClipboardData(text: value??"")).then((_) {
           print(value);
         });
       });
     });
   }
 
-  onMessageCallback(Map<String, dynamic> message) {
+  onMessageCallback(Map<String, dynamic>? message) {
     print(message);
   }
 
