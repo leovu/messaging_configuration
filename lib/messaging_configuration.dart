@@ -65,7 +65,7 @@ class MessagingConfiguration {
     if (!kIsWeb) {
       if (defaultTargetPlatform == TargetPlatform.iOS && isAWS) {
         try {
-          deviceToken = await (iOSPushToken.invokeMethod('getToken') as FutureOr<String>);
+          deviceToken = await (iOSPushToken.invokeMethod('getToken') as Future<dynamic>);
         } on PlatformException {
           print("Error receivePushNotificationToken");
           deviceToken = "";
