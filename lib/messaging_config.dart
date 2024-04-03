@@ -30,8 +30,8 @@ class MessagingConfig {
 
   MessagingConfig._internal();
 
-  Function(Map<String, dynamic>?)? onMessageCallback;
   Function(Map<String, dynamic>?)? onMessageBackgroundCallback;
+  Function(Map<String, dynamic>?)? onMessageCallback;
   bool isCustomForegroundNotification = false;
   Function? notificationInForeground;
   String? iconApp;
@@ -42,8 +42,11 @@ class MessagingConfig {
   final _awsMessaging = const MethodChannel('flutter.io/awsMessaging');
   final _vibrate = const MethodChannel('flutter.io/vibrate');
   BuildContext? context;
-  init(BuildContext context, Function(Map<String, dynamic>?)? onMessageCallback,
-      Function(Map<String, dynamic>?)? onMessageBackgroundCallback,
+  init(
+      BuildContext context,
+      Function(Map<String, dynamic>?) onMessageCallback,
+      Function(Map<String, dynamic>?) onMessageBackgroundCallback,
+      Function(Map<String, dynamic>?) onMessageBackground,
       {bool isAWSNotification = true,
       bool isCustomForegroundNotification = false,
       String? iconApp,
@@ -52,8 +55,8 @@ class MessagingConfig {
       Map<String, dynamic>? sound}) {
     this.context = context;
     this.iconApp = iconApp;
-    this.onMessageCallback = onMessageCallback;
     this.onMessageBackgroundCallback = onMessageBackgroundCallback;
+    this.onMessageCallback = onMessageCallback;
     this.notificationInForeground = notificationInForeground;
     this.isVibrate = isVibrate;
     this.isCustomForegroundNotification = isCustomForegroundNotification;
@@ -76,24 +79,21 @@ class MessagingConfig {
         }
         semaphore = 1;
         Future.delayed(Duration(seconds: 1)).then((_) => semaphore = 0);
-        print("onMessage: $message");
-        // if (!arrId.contains(message.messageId)) {
-        //   arrId.add(message.messageId);
+        print("FirebaseMessaging.onMessage");
         inAppMessageHandlerRemoteMessage(message);
-        // }
       });
-      // FirebaseMessaging.onBackgroundMessage((RemoteMessage message) {
-      //   print("onBackground: $message");
-      //   return myBackgroundMessageHandler(message.data);
-      // });
+      FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
+        print("FirebaseMessaging.onBackgroundMessage");
+        return onMessageBackground(message.data);
+      });
       FirebaseMessaging.instance
           .getInitialMessage()
           .then((RemoteMessage? message) {
-        print("getInitialMessage: $message");
+        print("FirebaseMessaging.instance.getInitialMessage");
         if (message != null) myBackgroundMessageHandler(message.data);
       });
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        print("onResume: $message");
+        print("FirebaseMessaging.onMessageOpenedApp");
         myBackgroundMessageHandler(message.data);
       });
     }
@@ -119,8 +119,8 @@ class MessagingConfig {
           this.myBackgroundMessageHandler(json.decode(message["data"]));
         } catch (e) {
           print(e);
-          final validMap =
-              json.decode(json.encode(message["data"])) as Map<String, dynamic>?;
+          final validMap = json.decode(json.encode(message["data"]))
+              as Map<String, dynamic>?;
           this.myBackgroundMessageHandler(validMap);
         }
         return null;
@@ -131,17 +131,17 @@ class MessagingConfig {
 
   Future<dynamic> inAppMessageHandlerRemoteMessage(
       RemoteMessage message) async {
-    String? title ="";
-    String? body ="";
+    String? title = "";
+    String? body = "";
 
-    if(message.notification?.title!=null){
+    if (message.notification?.title != null) {
       title = message.notification!.title;
-    }else if(message.data["title"]!=null){
+    } else if (message.data["title"] != null) {
       title = message.data["title"];
     }
-    if(message.notification?.body!=null){
+    if (message.notification?.body != null) {
       body = message.notification!.body;
-    }else if(message.data["body"]!=null){
+    } else if (message.data["body"] != null) {
       body = message.data["body"];
     }
     showAlertNotificationForeground(title, body, message.data);
@@ -177,8 +177,8 @@ class MessagingConfig {
         onMessageCallback!(message);
       }
     } else {
-      showNotificationDefault(notiTitle, notiDes, message, omCB: (){
-        if(onMessageCallback != null) {
+      showNotificationDefault(notiTitle, notiDes, message, omCB: () {
+        if (onMessageCallback != null) {
           onMessageCallback!(message);
         }
       });
@@ -207,7 +207,7 @@ class MessagingConfig {
           },
         );
       }, duration: Duration(seconds: 5));
-      if(!kIsWeb) {
+      if (!kIsWeb) {
         try {
           if (isVibrate!) {
             _vibrate.invokeMethod('vibrate');
@@ -215,7 +215,7 @@ class MessagingConfig {
           if (defaultTargetPlatform == TargetPlatform.iOS) {
             if (sound != null) {
               RingerMode ringerMode = await FlutterMute.getRingerMode();
-              if(ringerMode == RingerMode.Normal) {
+              if (ringerMode == RingerMode.Normal) {
                 final player = AudioPlayer();
                 player.play(AssetSource(sound!["asset"]));
               }
