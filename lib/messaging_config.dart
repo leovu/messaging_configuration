@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -82,10 +83,10 @@ class MessagingConfig {
         print("FirebaseMessaging.onMessage");
         inAppMessageHandlerRemoteMessage(message);
       });
-      FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
-        print("FirebaseMessaging.onBackgroundMessage");
-        return onMessageBackground(message.data);
-      });
+      // FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
+      //   print("FirebaseMessaging.onBackgroundMessage");
+      //   return onMessageBackground(message.data);
+      // });
       FirebaseMessaging.instance
           .getInitialMessage()
           .then((RemoteMessage? message) {
