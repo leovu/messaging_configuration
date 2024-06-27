@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +17,12 @@ class HexColor extends Color {
   }
 
   HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
+}
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message,
+    Function(Map<String, dynamic>?)? onMessageBackground) async {
+  onMessageBackground?.call(message.data);
 }
 
 class MessagingConfig {
@@ -83,10 +88,8 @@ class MessagingConfig {
         print("FirebaseMessaging.onMessage");
         inAppMessageHandlerRemoteMessage(message);
       });
-      // FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
-      //   print("FirebaseMessaging.onBackgroundMessage");
-      //   return onMessageBackground(message.data);
-      // });
+      FirebaseMessaging.onBackgroundMessage((message) =>
+          _firebaseMessagingBackgroundHandler(message, onMessageBackground));
       FirebaseMessaging.instance
           .getInitialMessage()
           .then((RemoteMessage? message) {
