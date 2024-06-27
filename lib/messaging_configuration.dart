@@ -39,7 +39,7 @@ class MessagingConfiguration {
       bool isAWSNotification = true,
       String? iconApp,
       bool isCustomForegroundNotification = false,
-      Function? notificationInForeground,
+      Function(Map<String, dynamic>?)? notificationInForeground,
       bool? isVibrate,
       String? sound,
       int? channelId}) async {

@@ -33,7 +33,7 @@ class MessagingConfig {
   Function(Map<String, dynamic>?)? onMessageBackgroundCallback;
   Function(Map<String, dynamic>?)? onMessageCallback;
   bool isCustomForegroundNotification = false;
-  Function? notificationInForeground;
+  Function(Map<String, dynamic>?)? notificationInForeground;
   String? iconApp;
   bool? isVibrate;
   // List<String> arrId = [];
@@ -50,7 +50,7 @@ class MessagingConfig {
       {bool isAWSNotification = true,
       bool isCustomForegroundNotification = false,
       String? iconApp,
-      Function? notificationInForeground,
+      Function(Map<String, dynamic>?)? notificationInForeground,
       bool? isVibrate = false,
       Map<String, dynamic>? sound}) {
     this.context = context;
@@ -223,9 +223,7 @@ class MessagingConfig {
         }
       }
     }
-    if (notificationInForeground != null) {
-      notificationInForeground!();
-    }
+    notificationInForeground?.call(message);
   }
 }
 
