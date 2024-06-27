@@ -15,6 +15,7 @@ dependencies:
   audioplayers: ^6.0.0
   flutter_mute: ^0.0.4
   firebase_core: ^2.15.0
+  flutter_local_notifications: ^17.1.2
 
 dev_dependencies:
   flutter_test:

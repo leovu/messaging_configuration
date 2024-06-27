@@ -92,6 +92,9 @@ You can only choose 1 between AWS and Firebase in iOS. If you choose Firebase, d
               <action android:name="FLUTTER_NOTIFICATION_CLICK" />
               <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <meta-data
+              android:name="com.google.firebase.messaging.default_notification_channel_id"
+              android:value="high_importance_channel" />
           </application>
           
 
