@@ -19,18 +19,18 @@ class MessagingConfiguration {
       } else {
         await Firebase.initializeApp();
       }
-    }
-    await FirebaseMessaging.instance.requestPermission();
-    if(defaultTargetPlatform == TargetPlatform.android){
-      const AndroidNotificationChannel channel = AndroidNotificationChannel(
-        'high_importance_channel',
-        'High Importance Notifications',
-        importance: Importance.max,
-      );
-      await FlutterLocalNotificationsPlugin()
-          .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-          ?.createNotificationChannel(channel);
+      await FirebaseMessaging.instance.requestPermission();
+      if(defaultTargetPlatform == TargetPlatform.android){
+        const AndroidNotificationChannel channel = AndroidNotificationChannel(
+          'high_importance_channel',
+          'High Importance Notifications',
+          importance: Importance.max,
+        );
+        await FlutterLocalNotificationsPlugin()
+            .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+            ?.createNotificationChannel(channel);
+      }
     }
   }
 
