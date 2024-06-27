@@ -19,12 +19,6 @@ class HexColor extends Color {
   HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
 }
 
-@pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message,
-    Function(Map<String, dynamic>?)? onMessageBackground) async {
-  onMessageBackground?.call(message.data);
-}
-
 class MessagingConfig {
   static final MessagingConfig _singleton = new MessagingConfig._internal();
   static MessagingConfig get singleton => _singleton;
@@ -52,7 +46,7 @@ class MessagingConfig {
       BuildContext context,
       Function(Map<String, dynamic>?) onMessageCallback,
       Function(Map<String, dynamic>?) onMessageBackgroundCallback,
-      Function(Map<String, dynamic>?) onMessageBackground,
+      BackgroundMessageHandler onMessageBackground,
       {bool isAWSNotification = true,
       bool isCustomForegroundNotification = false,
       String? iconApp,
@@ -88,8 +82,7 @@ class MessagingConfig {
         print("FirebaseMessaging.onMessage");
         inAppMessageHandlerRemoteMessage(message);
       });
-      FirebaseMessaging.onBackgroundMessage((message) =>
-          _firebaseMessagingBackgroundHandler(message, onMessageBackground));
+      FirebaseMessaging.onBackgroundMessage(onMessageBackground);
       FirebaseMessaging.instance
           .getInitialMessage()
           .then((RemoteMessage? message) {

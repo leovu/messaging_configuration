@@ -27,14 +27,15 @@ class MessagingConfiguration {
       importance: Importance.max,
     );
     await FlutterLocalNotificationsPlugin()
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
   }
 
   static setUpMessagingConfiguration(BuildContext context,
       {required Function(Map<String, dynamic>?) onMessageCallback,
       required Function(Map<String, dynamic>?) onMessageBackgroundCallback,
-      required Function(Map<String, dynamic>?) onMessageBackground,
+      required BackgroundMessageHandler onMessageBackground,
       bool isAWSNotification = true,
       String? iconApp,
       bool isCustomForegroundNotification = false,
@@ -77,8 +78,7 @@ class MessagingConfiguration {
     if (!kIsWeb) {
       if (defaultTargetPlatform == TargetPlatform.iOS && isAWS) {
         try {
-          deviceToken =
-              await (iOSPushToken.invokeMethod('getToken'));
+          deviceToken = await (iOSPushToken.invokeMethod('getToken'));
         } on PlatformException {
           print("Error receivePushNotificationToken");
           deviceToken = "";

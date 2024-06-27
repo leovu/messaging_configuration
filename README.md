@@ -97,6 +97,12 @@ You can only choose 1 between AWS and Firebase in iOS. If you choose Firebase, d
               android:value="high_importance_channel" />
           </application>
           
+   - add to top-level of the file setup Firebase Messaging
+
+          @pragma('vm:entry-point')
+          Future<void> _onMessageBackground(RemoteMessage message) async {
+
+          }
 
 ***In iOS:***
 

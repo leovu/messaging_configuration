@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter/services.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:messaging_configuration/messaging_configuration.dart';
 import 'package:overlay_support/overlay_support.dart';
+
+@pragma('vm:entry-point')
+Future<void> _onMessageBackground(RemoteMessage message) async {
+
+}
 
 void main() async {
   await MessagingConfiguration.init(isAWS: true);
@@ -22,7 +28,7 @@ class _MyAppState extends State<MyApp> {
       MessagingConfiguration.setUpMessagingConfiguration(context,
           onMessageCallback: onMessageCallback,
           notificationInForeground: _notificationInForeground,
-          onMessageBackground: onMessageBackground,
+          onMessageBackground: _onMessageBackground,
           onMessageBackgroundCallback: onMessageBackgroundCallback,
           isAWSNotification: false,
           iconApp: "assets/logo/icon-app.png",
