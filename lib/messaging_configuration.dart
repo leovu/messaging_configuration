@@ -1,37 +1,19 @@
 import 'dart:async';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:messaging_configuration/messaging_config.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class MessagingConfiguration {
   static init({bool isAWS = false, FirebaseOptions? options}) async {
     WidgetsFlutterBinding.ensureInitialized();
-    if (defaultTargetPlatform == TargetPlatform.iOS && isAWS) {
-    } else {
-      if (kIsWeb) {
-        await Firebase.initializeApp(options: options);
-      } else {
-        await Firebase.initializeApp();
-      }
-      await FirebaseMessaging.instance.requestPermission();
-      if(defaultTargetPlatform == TargetPlatform.android){
-        const AndroidNotificationChannel channel = AndroidNotificationChannel(
-          'high_importance_channel',
-          'High Importance Notifications',
-          importance: Importance.max,
-        );
-        await FlutterLocalNotificationsPlugin()
-            .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-            ?.createNotificationChannel(channel);
-      }
-    }
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+
+
   }
 
   static setUpMessagingConfiguration(BuildContext context,
@@ -138,4 +120,41 @@ class MessagingConfiguration {
     Uri file = await cache.load(fileName);
     return file.path;
   }
+}
+
+class DefaultFirebaseOptions {
+  static FirebaseOptions get currentPlatform {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return android;
+      case TargetPlatform.iOS:
+        return ios;
+      case TargetPlatform.linux:
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for linux - '
+              'you can reconfigure this by running the FlutterFire CLI again.',
+        );
+      default:
+        throw UnsupportedError(
+          'DefaultFirebaseOptions are not supported for this platform.',
+        );
+    }
+  }
+
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: 'AIzaSyCRXOJwNtna3EKFtDSFEBYasVBhaPri0oo',
+    appId: '1:230523064998:android:3dc7d4c6eb4cce5a55da67',
+    messagingSenderId: '230523064998',
+    projectId: 'hocgiagacon',
+    storageBucket: 'hocgiagacon.appspot.com',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyDwyLGsqx4VXW-9bbEdIAtG0tn_UalMkec',
+    appId: '1:230523064998:ios:4b51083c391cc64a55da67',
+    messagingSenderId: '230523064998',
+    projectId: 'hocgiagacon',
+    storageBucket: 'hocgiagacon.appspot.com',
+    iosBundleId: 'chickencombat',
+  );
 }
