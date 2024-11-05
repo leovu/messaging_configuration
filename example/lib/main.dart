@@ -33,7 +33,6 @@ class _MyAppState extends State<MyApp> {
           isAWSNotification: false,
           iconApp: "assets/logo/icon-app.png",
           isVibrate: true,
-          sound: "audio/alert_tone.mp3",
           channelId: 105);
       MessagingConfiguration.getPushToken().then((value) {
         Clipboard.setData(new ClipboardData(text: value??"")).then((_) {
