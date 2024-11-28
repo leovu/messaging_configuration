@@ -13,11 +13,6 @@ class MessagingConfiguration {
     WidgetsFlutterBinding.ensureInitialized();
     if (defaultTargetPlatform == TargetPlatform.iOS && isAWS) {
     } else {
-      if (kIsWeb) {
-        await Firebase.initializeApp(options: options);
-      } else {
-        await Firebase.initializeApp();
-      }
       await FirebaseMessaging.instance.requestPermission();
       if(defaultTargetPlatform == TargetPlatform.android){
         const AndroidNotificationChannel channel = AndroidNotificationChannel(
