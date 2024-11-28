@@ -9,12 +9,13 @@ import 'package:messaging_configuration/messaging_config.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class MessagingConfiguration {
-  static init({bool isAWS = false, FirebaseOptions? options}) async {
+  static init({bool isAWS = false, required FirebaseOptions options}) async {
     WidgetsFlutterBinding.ensureInitialized();
     if (defaultTargetPlatform == TargetPlatform.iOS && isAWS) {
     } else {
-      await FirebaseMessaging.instance.requestPermission();
+      await Firebase.initializeApp(options: options);
       if(defaultTargetPlatform == TargetPlatform.android){
+        await FirebaseMessaging.instance.requestPermission();
         const AndroidNotificationChannel channel = AndroidNotificationChannel(
           'high_importance_channel',
           'High Importance Notifications',
