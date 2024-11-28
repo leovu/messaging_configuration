@@ -9,23 +9,19 @@ import 'package:messaging_configuration/messaging_config.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class MessagingConfiguration {
-  static init({bool isAWS = false, required FirebaseOptions options}) async {
-    WidgetsFlutterBinding.ensureInitialized();
-    if (defaultTargetPlatform == TargetPlatform.iOS && isAWS) {
-    } else {
-      await Firebase.initializeApp(options: options);
-      if(defaultTargetPlatform == TargetPlatform.android){
-        await FirebaseMessaging.instance.requestPermission();
-        const AndroidNotificationChannel channel = AndroidNotificationChannel(
-          'high_importance_channel',
-          'High Importance Notifications',
-          importance: Importance.max,
-        );
-        await FlutterLocalNotificationsPlugin()
-            .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>()
-            ?.createNotificationChannel(channel);
-      }
+  static init({required FirebaseOptions options}) async {
+    await Firebase.initializeApp(options: options);
+    if(defaultTargetPlatform == TargetPlatform.android){
+      await FirebaseMessaging.instance.requestPermission();
+      const AndroidNotificationChannel channel = AndroidNotificationChannel(
+        'high_importance_channel',
+        'High Importance Notifications',
+        importance: Importance.max,
+      );
+      await FlutterLocalNotificationsPlugin()
+          .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(channel);
     }
   }
 

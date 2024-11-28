@@ -11,7 +11,6 @@ Future<void> _onMessageBackground(RemoteMessage message) async {
 }
 
 void main() async {
-  await MessagingConfiguration.init(isAWS: true);
   runApp(MyApp());
 }
 
