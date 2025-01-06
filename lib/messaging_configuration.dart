@@ -11,7 +11,7 @@ import 'package:firebase_core/firebase_core.dart';
 class MessagingConfiguration {
   static init({required FirebaseOptions options}) async {
     await Firebase.initializeApp(options: options);
-    if(defaultTargetPlatform == TargetPlatform.android){
+    if (defaultTargetPlatform == TargetPlatform.android) {
       await FirebaseMessaging.instance.requestPermission();
       const AndroidNotificationChannel channel = AndroidNotificationChannel(
         'high_importance_channel',
@@ -20,28 +20,29 @@ class MessagingConfiguration {
       );
       await FlutterLocalNotificationsPlugin()
           .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
+              AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(channel);
     }
   }
 
-  static setUpMessagingConfiguration(BuildContext context,
-      {required Function(Map<String, dynamic>?) onMessageCallback,
+  static setUpMessagingConfiguration(
+      {required BuildContext context,
+      required Function(Map<String, dynamic>?) onMessageCallback,
       required Function(Map<String, dynamic>?) onMessageBackgroundCallback,
       required BackgroundMessageHandler onMessageBackground,
-      bool isAWSNotification = true,
       String? iconApp,
       bool isCustomForegroundNotification = false,
       Function(Map<String, dynamic>?)? notificationInForeground,
-      bool? isVibrate,
-      int? channelId}) async {
-    MessagingConfig.singleton.init(context, onMessageCallback,
-        onMessageBackgroundCallback, onMessageBackground,
-        iconApp: iconApp,
-        isAWSNotification: isAWSNotification,
-        isCustomForegroundNotification: isCustomForegroundNotification,
-        notificationInForeground: notificationInForeground,
-        isVibrate: isVibrate);
+      bool isVibrate = false}) async {
+    MessagingConfig.singleton.init(
+        context,
+        onMessageCallback,
+        onMessageBackgroundCallback,
+        onMessageBackground,
+        notificationInForeground,
+        isCustomForegroundNotification,
+        iconApp,
+        isVibrate);
   }
 
   static void showNotificationDefault(String notiTitle, String notiDes,

@@ -28,26 +28,26 @@ class MessagingConfig {
 
   MessagingConfig._internal();
 
+  BuildContext? context;
   Function(Map<String, dynamic>?)? onMessageBackgroundCallback;
   Function(Map<String, dynamic>?)? onMessageCallback;
-  bool isCustomForegroundNotification = false;
   Function(Map<String, dynamic>?)? notificationInForeground;
+  bool isCustomForegroundNotification = false;
   String? iconApp;
   bool? isVibrate;
 
   final _awsMessaging = const MethodChannel('flutter.io/awsMessaging');
   final _vibrate = const MethodChannel('flutter.io/vibrate');
-  BuildContext? context;
+
   init(
       BuildContext context,
       Function(Map<String, dynamic>?) onMessageCallback,
       Function(Map<String, dynamic>?) onMessageBackgroundCallback,
       BackgroundMessageHandler onMessageBackground,
-      {bool isAWSNotification = true,
-      bool isCustomForegroundNotification = false,
-      String? iconApp,
       Function(Map<String, dynamic>?)? notificationInForeground,
-      bool? isVibrate = false}) {
+      bool isCustomForegroundNotification,
+      String? iconApp,
+      bool isVibrate) {
     this.context = context;
     this.iconApp = iconApp;
     this.onMessageBackgroundCallback = onMessageBackgroundCallback;
@@ -55,8 +55,8 @@ class MessagingConfig {
     this.notificationInForeground = notificationInForeground;
     this.isVibrate = isVibrate;
     this.isCustomForegroundNotification = isCustomForegroundNotification;
-    if (defaultTargetPlatform == TargetPlatform.iOS && isAWSNotification) {
-      setHandler();
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      _awsMessaging.setMethodCallHandler(methodCallHandler);
     } else {
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         if (semaphore != 0) {
@@ -67,12 +67,17 @@ class MessagingConfig {
         print("FirebaseMessaging.onMessage");
         inAppMessageHandlerRemoteMessage(message);
       });
-      FirebaseMessaging.onBackgroundMessage(onMessageBackground);
+      FirebaseMessaging.onBackgroundMessage((message) {
+        print("FirebaseMessaging.onBackgroundMessage");
+        return onMessageBackground(message);
+      });
       FirebaseMessaging.instance
           .getInitialMessage()
           .then((RemoteMessage? message) {
-        print("FirebaseMessaging.instance.getInitialMessage");
-        if (message != null) myBackgroundMessageHandler(message.data);
+        if (message != null) {
+          print("FirebaseMessaging.instance.getInitialMessage");
+          myBackgroundMessageHandler(message.data);
+        }
       });
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         print("FirebaseMessaging.onMessageOpenedApp");
@@ -81,31 +86,38 @@ class MessagingConfig {
     }
   }
 
-  void setHandler() {
-    _awsMessaging.setMethodCallHandler(methodCallHandler);
-  }
-
   Future<dynamic> methodCallHandler(MethodCall methodCall) async {
     switch (methodCall.method) {
       case 'onMessage':
-        print("onMessage: ${methodCall.arguments}");
+        if (semaphore != 0) {
+          return;
+        }
+        semaphore = 1;
+        Future.delayed(Duration(seconds: 1)).then((_) => semaphore = 0);
+        print("FirebaseMessaging.onMessage");
         Map<String, dynamic> message =
             Map<String, dynamic>.from(methodCall.arguments);
         this.inAppMessageHandler(message);
-        return null;
+        return;
       case 'onLaunch':
-        print("onLaunch: ${methodCall.arguments}");
+        print("FirebaseMessaging.onLaunch");
         Map<String, dynamic> message =
             Map<String, dynamic>.from(methodCall.arguments);
-        try {
-          this.myBackgroundMessageHandler(json.decode(message["data"]));
-        } catch (e) {
-          print(e);
-          final validMap = json.decode(json.encode(message["data"]))
-              as Map<String, dynamic>?;
-          this.myBackgroundMessageHandler(validMap);
+
+        dynamic data;
+        if (message["data"] != null) {
+          data = message["data"];
+        } else {
+          data = message;
         }
-        return null;
+
+        try {
+          this.myBackgroundMessageHandler(json.decode(data));
+        } catch (e) {
+          this.myBackgroundMessageHandler(
+              json.decode(json.encode(data)) as Map<String, dynamic>?);
+        }
+        return;
       default:
         throw PlatformException(code: 'notimpl', message: 'not implemented');
     }
@@ -139,14 +151,19 @@ class MessagingConfig {
       notiTitle = message["aps"]["alert"]["title"].toString();
       notiDes = message["aps"]["alert"]["body"].toString();
     }
+
+    dynamic data;
+    if (message["data"] != null) {
+      data = message["data"];
+    } else {
+      data = message;
+    }
+
     try {
-      showAlertNotificationForeground(
-          notiTitle, notiDes, json.decode(message["data"]));
+      showAlertNotificationForeground(notiTitle, notiDes, json.decode(data));
     } catch (e) {
-      print(e);
-      final validMap =
-          json.decode(json.encode(message["data"])) as Map<String, dynamic>?;
-      showAlertNotificationForeground(notiTitle, notiDes, validMap);
+      showAlertNotificationForeground(notiTitle, notiDes,
+          json.decode(json.encode(data)) as Map<String, dynamic>?);
     }
   }
 
