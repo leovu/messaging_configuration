@@ -67,10 +67,7 @@ class MessagingConfig {
         print("FirebaseMessaging.onMessage");
         inAppMessageHandlerRemoteMessage(message);
       });
-      FirebaseMessaging.onBackgroundMessage((message) {
-        print("FirebaseMessaging.onBackgroundMessage");
-        return onMessageBackground(message);
-      });
+      FirebaseMessaging.onBackgroundMessage(onMessageBackground);
       FirebaseMessaging.instance
           .getInitialMessage()
           .then((RemoteMessage? message) {
