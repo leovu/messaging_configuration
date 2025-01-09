@@ -55,28 +55,26 @@ class MessagingConfiguration {
   static const iOSPushToken = const MethodChannel('flutter.io/awsMessaging');
   static Future<String?> getPushToken(
       {bool isAWS = false, String? vapidKey}) async {
-    String? deviceToken = "";
+    String? deviceToken;
     if (!kIsWeb) {
       if (defaultTargetPlatform == TargetPlatform.iOS && isAWS) {
         try {
           deviceToken = await (iOSPushToken.invokeMethod('getToken'));
-        } on PlatformException {
+        } catch(_) {
           print("Error receivePushNotificationToken");
-          deviceToken = "";
         }
       } else {
-        deviceToken = (await FirebaseMessaging.instance.getToken())!;
-        if (deviceToken == "") {
+        deviceToken = await FirebaseMessaging.instance.getToken();
+        if ((deviceToken ?? "").isEmpty) {
           await FirebaseMessaging.instance.onTokenRefresh.last;
-          deviceToken = (await FirebaseMessaging.instance.getToken())!;
+          deviceToken = await FirebaseMessaging.instance.getToken();
         }
       }
     } else {
-      deviceToken =
-          (await FirebaseMessaging.instance.getToken(vapidKey: vapidKey))!;
-      if (deviceToken == "") {
+      deviceToken = await FirebaseMessaging.instance.getToken(vapidKey: vapidKey);
+      if ((deviceToken ?? "").isEmpty) {
         await FirebaseMessaging.instance.onTokenRefresh.last;
-        deviceToken = (await FirebaseMessaging.instance.getToken())!;
+        deviceToken = await FirebaseMessaging.instance.getToken();
       }
     }
     return deviceToken;
