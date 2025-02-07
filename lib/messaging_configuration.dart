@@ -56,26 +56,27 @@ class MessagingConfiguration {
   static Future<String?> getPushToken(
       {bool isAWS = false, String? vapidKey}) async {
     String? deviceToken;
-    if (!kIsWeb) {
-      if (defaultTargetPlatform == TargetPlatform.iOS && isAWS) {
-        try {
+    try {
+      if (!kIsWeb) {
+        if (defaultTargetPlatform == TargetPlatform.iOS && isAWS) {
           deviceToken = await (iOSPushToken.invokeMethod('getToken'));
-        } catch(_) {
-          print("Error receivePushNotificationToken");
+        } else {
+          deviceToken = await FirebaseMessaging.instance.getToken();
+          if ((deviceToken ?? "").isEmpty) {
+            await FirebaseMessaging.instance.onTokenRefresh.last;
+            deviceToken = await FirebaseMessaging.instance.getToken();
+          }
         }
       } else {
-        deviceToken = await FirebaseMessaging.instance.getToken();
+        deviceToken =
+            await FirebaseMessaging.instance.getToken(vapidKey: vapidKey);
         if ((deviceToken ?? "").isEmpty) {
           await FirebaseMessaging.instance.onTokenRefresh.last;
           deviceToken = await FirebaseMessaging.instance.getToken();
         }
       }
-    } else {
-      deviceToken = await FirebaseMessaging.instance.getToken(vapidKey: vapidKey);
-      if ((deviceToken ?? "").isEmpty) {
-        await FirebaseMessaging.instance.onTokenRefresh.last;
-        deviceToken = await FirebaseMessaging.instance.getToken();
-      }
+    } catch (e) {
+      print("getPushToken error: ${e.toString()}");
     }
     return deviceToken;
   }
