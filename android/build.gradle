@@ -1,4 +1,4 @@
-group 'wao.flutter.application.project.messaging_configuration'
+group 'flutter.application.project.messaging_configuration'
 version '1.0-SNAPSHOT'
 
 buildscript {
@@ -25,7 +25,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    namespace 'wao.flutter.application.project.messaging_configuration'
+    namespace 'flutter.application.project.messaging_configuration'
     compileSdk 34
 
     compileOptions {

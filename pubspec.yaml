@@ -31,7 +31,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: wao.flutter.application.project.messaging_configuration
+        package: flutter.application.project.messaging_configuration
         pluginClass: MessagingConfigurationPlugin
       ios:
         pluginClass: MessagingConfigurationPlugin

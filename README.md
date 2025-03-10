@@ -80,7 +80,7 @@ You can only choose 1 between AWS and Firebase in iOS. If you choose Firebase, d
           .....
           
             <receiver
-                android:name="wao.flutter.application.project.messaging_configuration.FirebaseBroadcastReceiver"
+                android:name="flutter.application.project.messaging_configuration.FirebaseBroadcastReceiver"
                 android:exported="true"
                 android:permission="com.google.android.c2dm.permission.SEND">
                 <intent-filter>

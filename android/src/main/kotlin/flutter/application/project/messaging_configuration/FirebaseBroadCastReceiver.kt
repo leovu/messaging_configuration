@@ -1,4 +1,4 @@
-package wao.flutter.application.project.messaging_configuration
+package flutter.application.project.messaging_configuration
 
 import android.content.BroadcastReceiver
 import android.content.Context
