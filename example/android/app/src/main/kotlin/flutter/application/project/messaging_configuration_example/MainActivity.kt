@@ -1,4 +1,4 @@
-package wao.flutter.application.project.messaging_configuration_example
+package flutter.application.project.messaging_configuration_example
 
 import io.flutter.embedding.android.FlutterActivity
 

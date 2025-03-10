@@ -1,4 +1,4 @@
-package wao.flutter.application.project.messaging_configuration
+package flutter.application.project.messaging_configuration
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

@@ -80,7 +80,7 @@ You can only choose 1 between AWS and Firebase in iOS. If you choose Firebase, d
           .....
           
             <receiver
-                android:name="wao.flutter.application.project.messaging_configuration.FirebaseBroadcastReceiver"
+                android:name="flutter.application.project.messaging_configuration.FirebaseBroadcastReceiver"
                 android:exported="true"
                 android:permission="com.google.android.c2dm.permission.SEND">
                 <intent-filter>
@@ -96,8 +96,17 @@ You can only choose 1 between AWS and Firebase in iOS. If you choose Firebase, d
               <action android:name="FLUTTER_NOTIFICATION_CLICK" />
               <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+            <meta-data
+              android:name="com.google.firebase.messaging.default_notification_channel_id"
+              android:value="high_importance_channel" />
           </application>
           
+   - add to top-level of the file setup Firebase Messaging
+
+          @pragma('vm:entry-point')
+          Future<void> _onMessageBackground(RemoteMessage message) async {
+
+          }
 
 ***In iOS:***
 

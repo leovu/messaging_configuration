@@ -1,4 +1,4 @@
-package wao.flutter.application.project.messaging_configuration
+package flutter.application.project.messaging_configuration
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -7,7 +7,7 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.PowerManager
-import androidx.core.content.ContextCompat.getSystemService
+import android.widget.Toast
 
 
 class FirebaseBroadcastReceiver : BroadcastReceiver() {
@@ -19,11 +19,6 @@ class FirebaseBroadcastReceiver : BroadcastReceiver() {
         if(value != "") {
             try {
                 delayFunction({
-                    val audioManager: AudioManager? = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
-                    val currentVolume = audioManager!!.getStreamVolume(AudioManager.STREAM_NOTIFICATION)
-                    audioManager!!.setStreamVolume(AudioManager.STREAM_MUSIC,
-                        currentVolume,
-                        AudioManager.MODE_NORMAL)
                     AudioPlayer().playAudio(context, value)
                     releaseWakeLock()
                 }, 250)
@@ -74,12 +69,19 @@ class AudioPlayer {
             mMediaPlayer.setDataSource(fileName)
             mMediaPlayer.isLooping = false
             val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
-            val currentVolume = am!!.getStreamVolume(AudioManager.STREAM_NOTIFICATION)
-            if(currentVolume > 0) {
+            val currentVolumeNotification = am!!.getStreamVolume(AudioManager.STREAM_NOTIFICATION)
+            if(currentVolumeNotification > 0) {
                 if (am?.ringerMode == AudioManager.RINGER_MODE_NORMAL) {
-                    mMediaPlayer.setVolume(currentVolume.toFloat(), currentVolume.toFloat())
+                    val currentVolume = am!!.getStreamVolume(AudioManager.STREAM_MUSIC)
+                    if(currentVolume > 65) {
+                        mMediaPlayer.setVolume(50.toFloat(), currentVolume.toFloat())
+                    }
+                    else {
+                        mMediaPlayer.setVolume(25.toFloat(), currentVolume.toFloat())
+                    }
                     mMediaPlayer.prepare()
                     mMediaPlayer.start()
+                    mMediaPlayer.setVolume(currentVolume.toFloat(), currentVolume.toFloat())
                 }
             }
         }catch (ex: Exception){

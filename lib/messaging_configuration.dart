@@ -1,89 +1,90 @@
-import 'dart:io';
-import 'package:audioplayers/audioplayers.dart';
+import 'dart:async';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:messaging_configuration/messaging_config.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class MessagingConfiguration {
-  static init({bool isAWS = false}) async {
-    WidgetsFlutterBinding.ensureInitialized();
-    if (defaultTargetPlatform == TargetPlatform.iOS && isAWS) {
-    } else {
-      await Firebase.initializeApp();
+  static init({required FirebaseOptions options}) async {
+    await Firebase.initializeApp(options: options);
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      await FirebaseMessaging.instance.requestPermission();
+      const AndroidNotificationChannel channel = AndroidNotificationChannel(
+        'high_importance_channel',
+        'High Importance Notifications',
+        importance: Importance.max,
+      );
+      await FlutterLocalNotificationsPlugin()
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(channel);
     }
   }
 
-  static setUpMessagingConfiguration(BuildContext context,
-      {Function(Map<String, dynamic>) onMessageCallback,
-      Function(Map<String, dynamic>) onMessageBackgroundCallback,
-      bool isAWSNotification = true,
-      String iconApp,
+  static setUpMessagingConfiguration(
+      {required BuildContext context,
+      required Function(Map<String, dynamic>?) onMessageCallback,
+      required Function(Map<String, dynamic>?) onMessageBackgroundCallback,
+      required BackgroundMessageHandler onMessageBackground,
+      String? iconApp,
       bool isCustomForegroundNotification = false,
-      Function notificationInForeground,
-      bool isVibrate,
-      String sound,
-      int channelId}) async {
-    String asset;
-    if (sound != null) {
-      AudioCache player = AudioCache();
-      if (defaultTargetPlatform == TargetPlatform.iOS) {
-        asset = sound;
-      } else {
-        asset = await getAbsoluteUrl(sound, player);
-      }
-    }
+      Function(Map<String, dynamic>?)? notificationInForeground,
+      bool isVibrate = false}) async {
     MessagingConfig.singleton.init(
-        context, onMessageCallback, onMessageBackgroundCallback,
-        iconApp: iconApp,
-        isAWSNotification: isAWSNotification,
-        isCustomForegroundNotification: isCustomForegroundNotification,
-        notificationInForeground: notificationInForeground,
-        isVibrate: isVibrate,
-        sound: (asset != null && channelId != null)
-            ? {"asset": asset, "channelId": channelId}
-            : null);
+        context,
+        onMessageCallback,
+        onMessageBackgroundCallback,
+        onMessageBackground,
+        notificationInForeground,
+        isCustomForegroundNotification,
+        iconApp,
+        isVibrate);
   }
 
   static void showNotificationDefault(String notiTitle, String notiDes,
-      Map<String, dynamic> message, Function onMessageCallback) {
+      Map<String, dynamic> message, Function? onMessageCallback) {
     MessagingConfig.singleton.showNotificationDefault(
         notiTitle, notiDes, message,
         omCB: onMessageCallback);
   }
 
   static const iOSPushToken = const MethodChannel('flutter.io/awsMessaging');
-  static Future<String> getPushToken({bool isAWS = false,  String vapidKey}) async {
-    String deviceToken = "";
-    if (!kIsWeb) {
-      if (defaultTargetPlatform == TargetPlatform.iOS && isAWS) {
-        try {
-          deviceToken = await iOSPushToken.invokeMethod('getToken');
-        } on PlatformException {
-          print("Error receivePushNotificationToken");
-          deviceToken = "";
+  static Future<String?> getPushToken(
+      {bool isAWS = false, String? vapidKey}) async {
+    String? deviceToken;
+    try {
+      if (!kIsWeb) {
+        if (defaultTargetPlatform == TargetPlatform.iOS && isAWS) {
+          deviceToken = await (iOSPushToken.invokeMethod('getToken'));
+        } else {
+          deviceToken = await FirebaseMessaging.instance.getToken();
+          if ((deviceToken ?? "").isEmpty) {
+            await FirebaseMessaging.instance.onTokenRefresh.last;
+            deviceToken = await FirebaseMessaging.instance.getToken();
+          }
         }
       } else {
-        deviceToken = await FirebaseMessaging.instance.getToken();
-        if (deviceToken == null || deviceToken == "") {
+        deviceToken =
+            await FirebaseMessaging.instance.getToken(vapidKey: vapidKey);
+        if ((deviceToken ?? "").isEmpty) {
           await FirebaseMessaging.instance.onTokenRefresh.last;
           deviceToken = await FirebaseMessaging.instance.getToken();
         }
       }
-    }else {
-      deviceToken = await FirebaseMessaging.instance.getToken(vapidKey: vapidKey);
-      if (deviceToken == null || deviceToken == "") {
-        await FirebaseMessaging.instance.onTokenRefresh.last;
-        deviceToken = await FirebaseMessaging.instance.getToken();
-      }
+    } catch (e) {
+      print("getPushToken error: ${e.toString()}");
     }
     return deviceToken;
   }
+
   static Future<bool> requestPermission() async {
     bool status = false;
-    NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+    NotificationSettings settings =
+        await FirebaseMessaging.instance.requestPermission(
       alert: true,
       announcement: false,
       badge: true,
@@ -95,7 +96,8 @@ class MessagingConfiguration {
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       print('User granted permission');
       status = true;
-    } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
       print('User granted provisional permission');
       status = true;
     } else {
@@ -103,18 +105,5 @@ class MessagingConfiguration {
       status = false;
     }
     return status;
-  }
-
-
-
-
-  static Future<String> getAbsoluteUrl(
-      String fileName, AudioCache cache) async {
-    String prefix = 'assets/';
-    if (kIsWeb) {
-      return 'assets/$prefix$fileName';
-    }
-    Uri file = await cache.load(fileName);
-    return file.path;
   }
 }

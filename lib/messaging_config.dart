@@ -1,11 +1,9 @@
 import 'dart:convert';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:flutter_mute/flutter_mute.dart';
 
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
@@ -30,45 +28,35 @@ class MessagingConfig {
 
   MessagingConfig._internal();
 
-  Function(Map<String, dynamic>) onMessageCallback;
-  Function(Map<String, dynamic>) onMessageBackgroundCallback;
+  BuildContext? context;
+  Function(Map<String, dynamic>?)? onMessageBackgroundCallback;
+  Function(Map<String, dynamic>?)? onMessageCallback;
+  Function(Map<String, dynamic>?)? notificationInForeground;
   bool isCustomForegroundNotification = false;
-  Function notificationInForeground;
-  String iconApp;
-  bool isVibrate;
-  // List<String> arrId = [];
-  Map<String, dynamic> sound;
+  String? iconApp;
+  bool? isVibrate;
 
   final _awsMessaging = const MethodChannel('flutter.io/awsMessaging');
   final _vibrate = const MethodChannel('flutter.io/vibrate');
-  BuildContext context;
-  init(BuildContext context, Function(Map<String, dynamic>) onMessageCallback,
-      Function(Map<String, dynamic>) onMessageBackgroundCallback,
-      {bool isAWSNotification = true,
-      bool isCustomForegroundNotification = false,
-      String iconApp,
-      Function notificationInForeground,
-      bool isVibrate = false,
-      Map<String, dynamic> sound}) {
+
+  init(
+      BuildContext context,
+      Function(Map<String, dynamic>?) onMessageCallback,
+      Function(Map<String, dynamic>?) onMessageBackgroundCallback,
+      BackgroundMessageHandler onMessageBackground,
+      Function(Map<String, dynamic>?)? notificationInForeground,
+      bool isCustomForegroundNotification,
+      String? iconApp,
+      bool isVibrate) {
     this.context = context;
     this.iconApp = iconApp;
-    this.onMessageCallback = onMessageCallback;
     this.onMessageBackgroundCallback = onMessageBackgroundCallback;
+    this.onMessageCallback = onMessageCallback;
     this.notificationInForeground = notificationInForeground;
     this.isVibrate = isVibrate;
     this.isCustomForegroundNotification = isCustomForegroundNotification;
-    this.sound = sound;
-    if (sound != null) {
-      if (defaultTargetPlatform == TargetPlatform.android) {
-        const audioSoundSetup =
-            const MethodChannel('flutter.io/audioSoundSetup');
-        audioSoundSetup
-            .invokeMethod('setupSound', sound)
-            .then((value) => print(value));
-      }
-    }
-    if (defaultTargetPlatform == TargetPlatform.iOS && isAWSNotification) {
-      setHandler();
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      _awsMessaging.setMethodCallHandler(methodCallHandler);
     } else {
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         if (semaphore != 0) {
@@ -76,54 +64,57 @@ class MessagingConfig {
         }
         semaphore = 1;
         Future.delayed(Duration(seconds: 1)).then((_) => semaphore = 0);
-        print("onMessage: $message");
-        // if (!arrId.contains(message.messageId)) {
-        //   arrId.add(message.messageId);
+        print("FirebaseMessaging.onMessage");
         inAppMessageHandlerRemoteMessage(message);
-        // }
       });
-      // FirebaseMessaging.onBackgroundMessage((RemoteMessage message) {
-      //   print("onBackground: $message");
-      //   return myBackgroundMessageHandler(message.data);
-      // });
+      FirebaseMessaging.onBackgroundMessage(onMessageBackground);
       FirebaseMessaging.instance
           .getInitialMessage()
-          .then((RemoteMessage message) {
-        print("getInitialMessage: $message");
-        if (message != null) myBackgroundMessageHandler(message.data);
+          .then((RemoteMessage? message) {
+        if (message != null) {
+          print("FirebaseMessaging.instance.getInitialMessage");
+          myBackgroundMessageHandler(message.data);
+        }
       });
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        print("onResume: $message");
+        print("FirebaseMessaging.onMessageOpenedApp");
         myBackgroundMessageHandler(message.data);
       });
     }
   }
 
-  void setHandler() {
-    _awsMessaging.setMethodCallHandler(methodCallHandler);
-  }
-
   Future<dynamic> methodCallHandler(MethodCall methodCall) async {
     switch (methodCall.method) {
       case 'onMessage':
-        print("onMessage: ${methodCall.arguments}");
+        if (semaphore != 0) {
+          return;
+        }
+        semaphore = 1;
+        Future.delayed(Duration(seconds: 1)).then((_) => semaphore = 0);
+        print("FirebaseMessaging.onMessage");
         Map<String, dynamic> message =
             Map<String, dynamic>.from(methodCall.arguments);
         this.inAppMessageHandler(message);
-        return null;
+        return;
       case 'onLaunch':
-        print("onLaunch: ${methodCall.arguments}");
+        print("FirebaseMessaging.onLaunch");
         Map<String, dynamic> message =
             Map<String, dynamic>.from(methodCall.arguments);
-        try {
-          this.myBackgroundMessageHandler(json.decode(message["data"]));
-        } catch (e) {
-          print(e);
-          final validMap =
-              json.decode(json.encode(message["data"])) as Map<String, dynamic>;
-          this.myBackgroundMessageHandler(validMap);
+
+        dynamic data;
+        if (message["data"] != null) {
+          data = message["data"];
+        } else {
+          data = message;
         }
-        return null;
+
+        try {
+          this.myBackgroundMessageHandler(json.decode(data));
+        } catch (e) {
+          this.myBackgroundMessageHandler(
+              json.decode(json.encode(data)) as Map<String, dynamic>?);
+        }
+        return;
       default:
         throw PlatformException(code: 'notimpl', message: 'not implemented');
     }
@@ -131,8 +122,20 @@ class MessagingConfig {
 
   Future<dynamic> inAppMessageHandlerRemoteMessage(
       RemoteMessage message) async {
-    showAlertNotificationForeground(
-        message.notification.title, message.notification.body, message.data);
+    String? title = "";
+    String? body = "";
+
+    if (message.notification?.title != null) {
+      title = message.notification!.title;
+    } else if (message.data["title"] != null) {
+      title = message.data["title"];
+    }
+    if (message.notification?.body != null) {
+      body = message.notification!.body;
+    } else if (message.data["body"] != null) {
+      body = message.data["body"];
+    }
+    showAlertNotificationForeground(title, body, message.data);
   }
 
   Future<dynamic> inAppMessageHandler(Map<String, dynamic> message) async {
@@ -145,44 +148,49 @@ class MessagingConfig {
       notiTitle = message["aps"]["alert"]["title"].toString();
       notiDes = message["aps"]["alert"]["body"].toString();
     }
+
+    dynamic data;
+    if (message["data"] != null) {
+      data = message["data"];
+    } else {
+      data = message;
+    }
+
     try {
-      showAlertNotificationForeground(
-          notiTitle, notiDes, json.decode(message["data"]));
+      showAlertNotificationForeground(notiTitle, notiDes, json.decode(data));
     } catch (e) {
-      print(e);
-      final validMap =
-          json.decode(json.encode(message["data"])) as Map<String, dynamic>;
-      showAlertNotificationForeground(notiTitle, notiDes, validMap);
+      showAlertNotificationForeground(notiTitle, notiDes,
+          json.decode(json.encode(data)) as Map<String, dynamic>?);
     }
   }
 
   void showAlertNotificationForeground(
-      String notiTitle, String notiDes, Map<String, dynamic> message) {
+      String? notiTitle, String? notiDes, Map<String, dynamic>? message) {
     if (isCustomForegroundNotification) {
       if (onMessageCallback != null) {
-        message["title"] = notiTitle;
+        message!["title"] = notiTitle;
         message["body"] = notiDes;
-        onMessageCallback(message);
+        onMessageCallback!(message);
       }
     } else {
-      showNotificationDefault(notiTitle, notiDes, message, omCB: (){
-        if(onMessageCallback != null) {
-          onMessageCallback(message);
+      showNotificationDefault(notiTitle, notiDes, message, omCB: () {
+        if (onMessageCallback != null) {
+          onMessageCallback!(message);
         }
       });
     }
   }
 
   Future<dynamic> myBackgroundMessageHandler(
-      Map<String, dynamic> message) async {
+      Map<String, dynamic>? message) async {
     if (onMessageBackgroundCallback != null) {
-      onMessageBackgroundCallback(message);
+      onMessageBackgroundCallback!(message);
     }
   }
 
   void showNotificationDefault(
-      String notiTitle, String notiDes, Map<String, dynamic> message,
-      {Function omCB}) async {
+      String? notiTitle, String? notiDes, Map<String, dynamic>? message,
+      {Function? omCB}) async {
     if (notiTitle != null && notiDes != null) {
       showOverlayNotification((context) {
         return BannerNotification(
@@ -190,41 +198,30 @@ class MessagingConfig {
           notiDescription: notiDes,
           iconApp: iconApp,
           onReplay: () {
-            omCB();
-            OverlaySupportEntry.of(context).dismiss();
+            omCB!();
+            OverlaySupportEntry.of(context)!.dismiss();
           },
         );
       }, duration: Duration(seconds: 5));
-      if(!kIsWeb) {
+      if (!kIsWeb) {
         try {
-          if (isVibrate) {
+          if (isVibrate!) {
             _vibrate.invokeMethod('vibrate');
-          }
-          if (defaultTargetPlatform == TargetPlatform.iOS) {
-            if (sound != null) {
-              RingerMode ringerMode = await FlutterMute.getRingerMode();
-              if(ringerMode == RingerMode.Normal) {
-                AudioCache player = AudioCache();
-                player.play(sound["asset"]);
-              }
-            }
           }
         } catch (e) {
           print(e);
         }
       }
     }
-    if (notificationInForeground != null) {
-      notificationInForeground();
-    }
+    notificationInForeground?.call(message);
   }
 }
 
 class BannerNotification extends StatefulWidget {
-  final String notiTitle;
-  final String notiDescription;
-  final String iconApp;
-  final Function onReplay;
+  final String? notiTitle;
+  final String? notiDescription;
+  final String? iconApp;
+  final Function? onReplay;
 
   BannerNotification(
       {this.notiTitle, this.notiDescription, this.onReplay, this.iconApp});
@@ -251,7 +248,7 @@ class BannerNotificationState extends State<BannerNotification> {
         key: UniqueKey(),
         direction: DismissDirection.up,
         onDismissed: (direction) {
-          OverlaySupportEntry.of(context).dismiss(animate: false);
+          OverlaySupportEntry.of(context)!.dismiss(animate: false);
         },
         child: Padding(
           padding: const EdgeInsets.all(12.0),
@@ -272,7 +269,7 @@ class BannerNotificationState extends State<BannerNotification> {
               color: Colors.white,
               child: ListTile(
                 onTap: () {
-                  if (widget.onReplay != null) widget.onReplay();
+                  if (widget.onReplay != null) widget.onReplay!();
                 },
                 title: Padding(
                   padding: const EdgeInsets.only(top: 5.0),
@@ -292,7 +289,7 @@ class BannerNotificationState extends State<BannerNotification> {
                           child: Container(
                             child: widget.iconApp == null
                                 ? Container()
-                                : Image.asset(widget.iconApp,
+                                : Image.asset(widget.iconApp!,
                                     fit: BoxFit.contain),
                           ),
                         ),
@@ -305,7 +302,7 @@ class BannerNotificationState extends State<BannerNotification> {
                             Padding(
                               padding: const EdgeInsets.only(left: 5.0),
                               child: Text(
-                                widget.notiTitle,
+                                widget.notiTitle!,
                                 maxLines: 1,
                                 style: TextStyle(
                                     color: Colors.black,
@@ -317,7 +314,7 @@ class BannerNotificationState extends State<BannerNotification> {
                             Padding(
                               padding: const EdgeInsets.only(
                                   left: 5.0, top: 5.0, bottom: 5.0),
-                              child: Text(widget.notiDescription,
+                              child: Text(widget.notiDescription!,
                                   maxLines: 2,
                                   style: TextStyle(
                                       color: Colors.black, fontSize: 12),
