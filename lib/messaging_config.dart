@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:vibration/vibration.dart';
 
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
@@ -37,7 +38,6 @@ class MessagingConfig {
   bool? isVibrate;
 
   final _awsMessaging = const MethodChannel('flutter.io/awsMessaging');
-  final _vibrate = const MethodChannel('flutter.io/vibrate');
 
   init(
       BuildContext context,
@@ -206,7 +206,7 @@ class MessagingConfig {
       if (!kIsWeb) {
         try {
           if (isVibrate!) {
-            _vibrate.invokeMethod('vibrate');
+            Vibration.vibrate();
           }
         } catch (e) {
           print(e);
