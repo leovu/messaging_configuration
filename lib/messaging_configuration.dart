@@ -5,8 +5,10 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:messaging_configuration/messaging_config.dart';
 import 'package:firebase_core/firebase_core.dart';
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
@@ -15,6 +17,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
   print("Handling a background message: ${message.messageId}");
 }
+
 class MessagingConfiguration {
   static init({bool isAWS = false, FirebaseOptions? options}) async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -24,8 +27,22 @@ class MessagingConfiguration {
         await Firebase.initializeApp(options: options);
       } else {
         await Firebase.initializeApp();
-        FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+        FirebaseMessaging.onBackgroundMessage(
+            _firebaseMessagingBackgroundHandler);
       }
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      await FirebaseMessaging.instance.requestPermission();
+      const AndroidNotificationChannel channel = AndroidNotificationChannel(
+        'high_importance_channel',
+        'High Importance Notifications',
+        importance: Importance.max,
+      );
+      await FlutterLocalNotificationsPlugin()
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(channel);
     }
   }
 
@@ -75,8 +92,7 @@ class MessagingConfiguration {
     if (!kIsWeb) {
       if (defaultTargetPlatform == TargetPlatform.iOS && isAWS) {
         try {
-          deviceToken =
-              await (iOSPushToken.invokeMethod('getToken'));
+          deviceToken = await (iOSPushToken.invokeMethod('getToken'));
         } on PlatformException {
           print("Error receivePushNotificationToken");
           deviceToken = "";
