@@ -6,7 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:flutter_mute/flutter_mute.dart';
+import 'package:sound_mode/sound_mode.dart';
+import 'package:sound_mode/utils/ringer_mode_statuses.dart';
 
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
@@ -215,8 +216,8 @@ class MessagingConfig {
           }
           if (defaultTargetPlatform == TargetPlatform.iOS) {
             if (sound != null) {
-              RingerMode ringerMode = await FlutterMute.getRingerMode();
-              if (ringerMode == RingerMode.Normal) {
+              final ringerStatus = await SoundMode.ringerModeStatus;
+              if (ringerStatus == RingerModeStatus.normal) {
                 final player = AudioPlayer();
                 player.play(AssetSource(sound!["asset"]));
               }
