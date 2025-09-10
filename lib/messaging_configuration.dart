@@ -10,10 +10,11 @@ import 'package:messaging_configuration/messaging_config.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 @pragma('vm:entry-point')
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+Future<void> _firebaseMessagingBackgroundHandler(
+    FirebaseOptions? options, RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(options: options);
 
   print("Handling a background message: ${message.messageId}");
 }
@@ -26,9 +27,9 @@ class MessagingConfiguration {
       if (kIsWeb) {
         await Firebase.initializeApp(options: options);
       } else {
-        await Firebase.initializeApp();
+        await Firebase.initializeApp(options: options);
         FirebaseMessaging.onBackgroundMessage(
-            _firebaseMessagingBackgroundHandler);
+            (message) => _firebaseMessagingBackgroundHandler(options, message));
       }
     }
 
